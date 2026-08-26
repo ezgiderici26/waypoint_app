@@ -6,6 +6,7 @@ import '../providers/heatmap_providers.dart';
 import '../widgets/heatmap_legend.dart';
 import '../widgets/heatmap_stats_sheet.dart';
 import '../widgets/heatmap_point_detail_dialog.dart';
+import '../widgets/heatmap_radar_canvas.dart';
 
 class AdminHeatmapScreen extends ConsumerStatefulWidget {
   const AdminHeatmapScreen({super.key});
@@ -17,9 +18,8 @@ class AdminHeatmapScreen extends ConsumerStatefulWidget {
 class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
   GoogleMapController? _mapController;
   String _selectedHub = 'Kadıköy';
-
-  // Istanbul Central Coordinates
-  static const LatLng _initialPosition = LatLng(41.0200, 29.0050);
+  bool _useRadarCanvas =
+      true; // Default to tactical radar canvas so heatmap is 100% visible immediately!
 
   // Key Istanbul Hub Locations for Quick Navigation
   static const Map<String, LatLng> _hubs = {
@@ -75,6 +75,7 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
   Widget build(BuildContext context) {
     final heatmapState = ref.watch(heatmapNotifierProvider);
     final heatmapNotifier = ref.read(heatmapNotifierProvider.notifier);
+    final clusters = ref.watch(heatmapClustersProvider);
     final circles = ref.watch(heatmapCirclesProvider);
     final markers = ref.watch(heatmapMarkersProvider);
     final stats = ref.watch(heatmapStatsProvider);
@@ -99,6 +100,32 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
       appBar: AppBar(
         title: const Text("YÖNETİCİ ISI HARİTASI"),
         actions: [
+          IconButton(
+            tooltip: _useRadarCanvas
+                ? "Google Harita Görünümüne Geç"
+                : "Taktik Radar Görünümüne Geç",
+            icon: Icon(
+              _useRadarCanvas ? Icons.map_rounded : Icons.radar_rounded,
+              color: _useRadarCanvas ? Colors.cyanAccent : AppTheme.primary,
+            ),
+            onPressed: () {
+              setState(() {
+                _useRadarCanvas = !_useRadarCanvas;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    _useRadarCanvas
+                        ? "🎯 Taktik Radar & Canlı Isı Tuvali Modu Aktif!"
+                        : "🗺️ Google Maps Görünümü Aktif!",
+                  ),
+                  backgroundColor: AppTheme.primary,
+                  duration: const Duration(seconds: 1),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+          ),
           IconButton(
             tooltip: "Demo Küme Verisi Yükle",
             icon: const Icon(Icons.science_rounded, color: AppTheme.primary),
@@ -127,25 +154,35 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
       ),
       body: Stack(
         children: [
-          // 1. Google Map
-          GoogleMap(
-            initialCameraPosition: const CameraPosition(
-              target: LatLng(40.9905, 29.0255),
-              zoom: 14.5,
+          // 1. Map View (Tactical Radar Canvas OR Google Maps)
+          if (_useRadarCanvas)
+            HeatmapRadarCanvas(
+              clusters: clusters,
+              mode: heatmapState.mode,
+              selectedHub: _selectedHub,
+              onClusterTap: (cluster) {
+                heatmapNotifier.selectCluster(cluster);
+              },
+            )
+          else
+            GoogleMap(
+              initialCameraPosition: const CameraPosition(
+                target: LatLng(40.9905, 29.0255),
+                zoom: 14.5,
+              ),
+              onMapCreated: (controller) {
+                _mapController = controller;
+                Future.delayed(const Duration(milliseconds: 250), () {
+                  _navigateToLocation('Kadıköy', _hubs['Kadıköy']!, zoom: 14.8);
+                });
+              },
+              circles: circles,
+              markers: markers,
+              myLocationEnabled: false,
+              myLocationButtonEnabled: false,
+              zoomControlsEnabled: false,
+              mapToolbarEnabled: false,
             ),
-            onMapCreated: (controller) {
-              _mapController = controller;
-              Future.delayed(const Duration(milliseconds: 250), () {
-                _navigateToLocation('Kadıköy', _hubs['Kadıköy']!, zoom: 14.8);
-              });
-            },
-            circles: circles,
-            markers: markers,
-            myLocationEnabled: false,
-            myLocationButtonEnabled: false,
-            zoomControlsEnabled: false,
-            mapToolbarEnabled: false,
-          ),
 
           // 2. Top Control Panel (Mode Selector & Filters)
           Positioned(
