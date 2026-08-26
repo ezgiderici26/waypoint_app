@@ -9,20 +9,20 @@ import '../../../../core/theme/app_theme.dart';
 
 enum HeatmapMode {
   density, // Yoğunluk Odaklı (Density Heatmap)
-  risk,    // Tehdit ve Güvenlik Riski Odaklı (Risk/Spoofing Heatmap)
-  points,  // Noktasal / Detaylı Pin Görünümü
+  risk, // Tehdit ve Güvenlik Riski Odaklı (Risk/Spoofing Heatmap)
+  points, // Noktasal / Detaylı Pin Görünümü
 }
 
 enum RiskFilter {
-  all,      // Tümü
+  all, // Tümü
   safeOnly, // Sadece Güvenli (< 35)
-  riskyOnly,// Sadece Riskli / Engellenmiş (>= 35)
+  riskyOnly, // Sadece Riskli / Engellenmiş (>= 35)
 }
 
 enum TimeFilter {
-  allTime,     // Tüm Zamanlar
+  allTime, // Tüm Zamanlar
   last24Hours, // Son 24 Saat
-  last7Days,   // Son 7 Gün
+  last7Days, // Son 7 Gün
 }
 
 class HeatmapState {
@@ -57,8 +57,12 @@ class HeatmapState {
       riskFilter: riskFilter ?? this.riskFilter,
       timeFilter: timeFilter ?? this.timeFilter,
       radiusMultiplier: radiusMultiplier ?? this.radiusMultiplier,
-      selectedCluster: clearSelectedCluster ? null : (selectedCluster ?? this.selectedCluster),
-      selectedRecord: clearSelectedRecord ? null : (selectedRecord ?? this.selectedRecord),
+      selectedCluster: clearSelectedCluster
+          ? null
+          : (selectedCluster ?? this.selectedCluster),
+      selectedRecord: clearSelectedRecord
+          ? null
+          : (selectedRecord ?? this.selectedRecord),
     );
   }
 }
@@ -135,7 +139,9 @@ class HeatmapNotifier extends StateNotifier<HeatmapState> {
       ),
       CheckInRecord(
         id: 'seed-kd-3',
-        timestamp: now.subtract(const Duration(hours: 1, minutes: 10)).toIso8601String(),
+        timestamp: now
+            .subtract(const Duration(hours: 1, minutes: 10))
+            .toIso8601String(),
         latitude: 40.9903,
         longitude: 29.0252,
         accuracy: 5.0,
@@ -197,7 +203,9 @@ class HeatmapNotifier extends StateNotifier<HeatmapState> {
       ),
       CheckInRecord(
         id: 'seed-bsk-2',
-        timestamp: now.subtract(const Duration(hours: 1, minutes: 45)).toIso8601String(),
+        timestamp: now
+            .subtract(const Duration(hours: 1, minutes: 45))
+            .toIso8601String(),
         latitude: 41.0430,
         longitude: 29.0078,
         accuracy: 3.9,
@@ -209,7 +217,9 @@ class HeatmapNotifier extends StateNotifier<HeatmapState> {
       ),
       CheckInRecord(
         id: 'seed-bsk-3',
-        timestamp: now.subtract(const Duration(hours: 2, minutes: 20)).toIso8601String(),
+        timestamp: now
+            .subtract(const Duration(hours: 2, minutes: 20))
+            .toIso8601String(),
         latitude: 41.0426,
         longitude: 29.0072,
         accuracy: 5.5,
@@ -247,24 +257,30 @@ class HeatmapNotifier extends StateNotifier<HeatmapState> {
       ),
       CheckInRecord(
         id: 'seed-tks-2',
-        timestamp: now.subtract(const Duration(hours: 1, minutes: 30)).toIso8601String(),
+        timestamp: now
+            .subtract(const Duration(hours: 1, minutes: 30))
+            .toIso8601String(),
         latitude: 41.0372,
         longitude: 28.9853,
         accuracy: 4.0,
         riskScore: 90,
-        deviceStatus: 'Rooted: true, Emulator: false, VPN: false (Işınlanma/K4)',
+        deviceStatus:
+            'Rooted: true, Emulator: false, VPN: false (Işınlanma/K4)',
         targetName: 'Taksim Meydanı',
         isSynced: true,
         isBlocked: true,
       ),
       CheckInRecord(
         id: 'seed-tks-3',
-        timestamp: now.subtract(const Duration(hours: 3, minutes: 15)).toIso8601String(),
+        timestamp: now
+            .subtract(const Duration(hours: 3, minutes: 15))
+            .toIso8601String(),
         latitude: 41.0368,
         longitude: 28.9848,
         accuracy: 6.0,
         riskScore: 78,
-        deviceStatus: 'Rooted: false, Emulator: false, VPN: true (Sensör Uyuşmazlığı)',
+        deviceStatus:
+            'Rooted: false, Emulator: false, VPN: true (Sensör Uyuşmazlığı)',
         targetName: 'Taksim Meydanı',
         isSynced: false,
         isBlocked: true,
@@ -297,7 +313,9 @@ class HeatmapNotifier extends StateNotifier<HeatmapState> {
       ),
       CheckInRecord(
         id: 'seed-lvt-2',
-        timestamp: now.subtract(const Duration(hours: 2, minutes: 40)).toIso8601String(),
+        timestamp: now
+            .subtract(const Duration(hours: 2, minutes: 40))
+            .toIso8601String(),
         latitude: 41.0825,
         longitude: 29.0128,
         accuracy: 4.5,
@@ -309,7 +327,9 @@ class HeatmapNotifier extends StateNotifier<HeatmapState> {
       ),
       CheckInRecord(
         id: 'seed-lvt-3',
-        timestamp: now.subtract(const Duration(hours: 4, minutes: 50)).toIso8601String(),
+        timestamp: now
+            .subtract(const Duration(hours: 4, minutes: 50))
+            .toIso8601String(),
         latitude: 41.0820,
         longitude: 29.0122,
         accuracy: 3.8,
@@ -335,7 +355,9 @@ class HeatmapNotifier extends StateNotifier<HeatmapState> {
       ),
       CheckInRecord(
         id: 'seed-msl-2',
-        timestamp: now.subtract(const Duration(hours: 2, minutes: 10)).toIso8601String(),
+        timestamp: now
+            .subtract(const Duration(hours: 2, minutes: 10))
+            .toIso8601String(),
         latitude: 41.1063,
         longitude: 29.0244,
         accuracy: 3.5,
@@ -349,7 +371,9 @@ class HeatmapNotifier extends StateNotifier<HeatmapState> {
       // 6. Kadıköy Moda Sahil Hub
       CheckInRecord(
         id: 'seed-mda-1',
-        timestamp: now.subtract(const Duration(hours: 1, minutes: 20)).toIso8601String(),
+        timestamp: now
+            .subtract(const Duration(hours: 1, minutes: 20))
+            .toIso8601String(),
         latitude: 40.9840,
         longitude: 29.0280,
         accuracy: 4.1,
@@ -361,7 +385,9 @@ class HeatmapNotifier extends StateNotifier<HeatmapState> {
       ),
       CheckInRecord(
         id: 'seed-mda-2',
-        timestamp: now.subtract(const Duration(hours: 3, minutes: 40)).toIso8601String(),
+        timestamp: now
+            .subtract(const Duration(hours: 3, minutes: 40))
+            .toIso8601String(),
         latitude: 40.9842,
         longitude: 29.0283,
         accuracy: 5.2,
@@ -377,9 +403,10 @@ class HeatmapNotifier extends StateNotifier<HeatmapState> {
   }
 }
 
-final heatmapNotifierProvider = StateNotifierProvider<HeatmapNotifier, HeatmapState>((ref) {
-  return HeatmapNotifier();
-});
+final heatmapNotifierProvider =
+    StateNotifierProvider<HeatmapNotifier, HeatmapState>((ref) {
+      return HeatmapNotifier();
+    });
 
 /// Filters check-in records based on the selected Risk and Time filters
 final filteredHeatmapRecordsProvider = Provider<List<CheckInRecord>>((ref) {
@@ -388,10 +415,12 @@ final filteredHeatmapRecordsProvider = Provider<List<CheckInRecord>>((ref) {
 
   return allRecords.where((record) {
     // 1. Risk Filtering
-    if (state.riskFilter == RiskFilter.safeOnly && (record.isBlocked || record.riskScore >= 35)) {
+    if (state.riskFilter == RiskFilter.safeOnly &&
+        (record.isBlocked || record.riskScore >= 35)) {
       return false;
     }
-    if (state.riskFilter == RiskFilter.riskyOnly && (!record.isBlocked && record.riskScore < 35)) {
+    if (state.riskFilter == RiskFilter.riskyOnly &&
+        (!record.isBlocked && record.riskScore < 35)) {
       return false;
     }
 
@@ -436,10 +465,15 @@ final heatmapClustersProvider = Provider<List<HeatmapCluster>>((ref) {
       );
 
       if (distance <= clusterThresholdMeters) {
-        final updatedRecords = List<CheckInRecord>.from(cluster.records)..add(record);
+        final updatedRecords = List<CheckInRecord>.from(cluster.records)
+          ..add(record);
         // Recalculate centroid average
-        final newLat = updatedRecords.fold<double>(0.0, (s, r) => s + r.latitude) / updatedRecords.length;
-        final newLng = updatedRecords.fold<double>(0.0, (s, r) => s + r.longitude) / updatedRecords.length;
+        final newLat =
+            updatedRecords.fold<double>(0.0, (s, r) => s + r.latitude) /
+            updatedRecords.length;
+        final newLng =
+            updatedRecords.fold<double>(0.0, (s, r) => s + r.longitude) /
+            updatedRecords.length;
 
         clusters[i] = HeatmapCluster(
           id: cluster.id,
@@ -477,13 +511,16 @@ final heatmapCirclesProvider = Provider<Set<Circle>>((ref) {
 
   for (final cluster in clusters) {
     final LatLng center = LatLng(cluster.latitude, cluster.longitude);
-    final double baseRadius = 80.0 * state.radiusMultiplier * (1.0 + (cluster.count - 1) * 0.25);
+    final double baseRadius =
+        80.0 * state.radiusMultiplier * (1.0 + (cluster.count - 1) * 0.25);
 
     if (state.mode == HeatmapMode.density) {
       // Density Mode: Heat gradient based on number of check-ins
       Color coreColor;
       if (cluster.count >= 6) {
-        coreColor = const Color(0xFFFF3366); // Critical dense hotspot (Flame red)
+        coreColor = const Color(
+          0xFFFF3366,
+        ); // Critical dense hotspot (Flame red)
       } else if (cluster.count >= 4) {
         coreColor = const Color(0xFFFF9900); // Dense (Amber orange)
       } else if (cluster.count >= 2) {
@@ -538,12 +575,16 @@ final heatmapCirclesProvider = Provider<Set<Circle>>((ref) {
       );
     } else if (state.mode == HeatmapMode.risk) {
       // Risk & Spoofing Heatmap Mode
-      final bool isCritical = cluster.hasHighRisk || cluster.averageRiskScore >= 70;
-      final bool isSuspicious = cluster.averageRiskScore >= 35 && cluster.averageRiskScore < 70;
+      final bool isCritical =
+          cluster.hasHighRisk || cluster.averageRiskScore >= 70;
+      final bool isSuspicious =
+          cluster.averageRiskScore >= 35 && cluster.averageRiskScore < 70;
 
       final Color riskColor = isCritical
           ? const Color(0xFFEF4444) // Rose Red Alert
-          : (isSuspicious ? const Color(0xFFF59E0B) : const Color(0xFF10B981)); // Amber vs Green
+          : (isSuspicious
+                ? const Color(0xFFF59E0B)
+                : const Color(0xFF10B981)); // Amber vs Green
 
       // Outer Threat Ring
       circles.add(
@@ -620,9 +661,11 @@ final heatmapMarkersProvider = Provider<Set<Marker>>((ref) {
         hue = BitmapDescriptor.hueCyan;
       }
     } else {
-      hue = hasRisk 
-          ? BitmapDescriptor.hueRed 
-          : (cluster.averageRiskScore >= 35 ? BitmapDescriptor.hueOrange : BitmapDescriptor.hueGreen);
+      hue = hasRisk
+          ? BitmapDescriptor.hueRed
+          : (cluster.averageRiskScore >= 35
+                ? BitmapDescriptor.hueOrange
+                : BitmapDescriptor.hueGreen);
     }
 
     markers.add(
@@ -632,7 +675,8 @@ final heatmapMarkersProvider = Provider<Set<Marker>>((ref) {
         icon: BitmapDescriptor.defaultMarkerWithHue(hue),
         infoWindow: InfoWindow(
           title: "${cluster.primaryTargetName} (${cluster.count} Check-in)",
-          snippet: "Ort. Risk: ${cluster.averageRiskScore.toStringAsFixed(0)}/100 • Güvenli: ${cluster.safeCount} • Tehdit: ${cluster.blockedCount}",
+          snippet:
+              "Ort. Risk: ${cluster.averageRiskScore.toStringAsFixed(0)}/100 • Güvenli: ${cluster.safeCount} • Tehdit: ${cluster.blockedCount}",
         ),
         onTap: () {
           notifier.selectCluster(cluster);
@@ -690,12 +734,16 @@ final heatmapStatsProvider = Provider<HeatmapStats>((ref) {
   final safe = records.where((r) => !r.isBlocked && r.riskScore < 35).length;
   final riskyOrBlocked = records.length - safe;
   final safePct = (safe / records.length) * 100.0;
-  final avgRisk = records.fold<int>(0, (sum, r) => sum + r.riskScore) / records.length;
+  final avgRisk =
+      records.fold<int>(0, (sum, r) => sum + r.riskScore) / records.length;
 
   int vpnOrMockCount = 0;
   for (final r in records) {
     final status = r.deviceStatus.toLowerCase();
-    if (status.contains('mock') || status.contains('vpn: true') || status.contains('rooted: true') || status.contains('ışınlanma')) {
+    if (status.contains('mock') ||
+        status.contains('vpn: true') ||
+        status.contains('rooted: true') ||
+        status.contains('ışınlanma')) {
       vpnOrMockCount++;
     }
   }
@@ -720,12 +768,21 @@ final heatmapStatsProvider = Provider<HeatmapStats>((ref) {
   );
 });
 
-double _calculateHaversineDistance(double lat1, double lon1, double lat2, double lon2) {
+double _calculateHaversineDistance(
+  double lat1,
+  double lon1,
+  double lat2,
+  double lon2,
+) {
   const double r = 6371000; // Radius of Earth in meters
   final double dLat = (lat2 - lat1) * pi / 180;
   final double dLon = (lon2 - lon1) * pi / 180;
-  final double a = sin(dLat / 2) * sin(dLat / 2) +
-      cos(lat1 * pi / 180) * cos(lat2 * pi / 180) * sin(dLon / 2) * sin(dLon / 2);
+  final double a =
+      sin(dLat / 2) * sin(dLat / 2) +
+      cos(lat1 * pi / 180) *
+          cos(lat2 * pi / 180) *
+          sin(dLon / 2) *
+          sin(dLon / 2);
   final double c = 2 * atan2(sqrt(a), sqrt(1 - a));
   return r * c;
 }

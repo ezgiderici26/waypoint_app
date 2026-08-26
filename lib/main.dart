@@ -7,7 +7,7 @@ import 'features/location_map/presentation/screens/welcome_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Hive local database
   await Hive.initFlutter();
   await Hive.openBox('check_in_box');
@@ -15,11 +15,7 @@ void main() async {
   // Initialize Local Notifications
   await NotificationService().initialize();
 
-  runApp(
-    const ProviderScope(
-      child: WaypointApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: WaypointApp()));
 }
 
 class WaypointApp extends StatelessWidget {

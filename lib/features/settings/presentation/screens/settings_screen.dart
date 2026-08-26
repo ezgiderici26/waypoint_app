@@ -16,13 +16,19 @@ class SettingsScreen extends ConsumerStatefulWidget {
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _mockPreventionEnabled = true;
 
-  void _showGeofenceLogsDialog(BuildContext context, GeofenceState geofenceState, GeofenceNotifier geofenceNotifier) {
+  void _showGeofenceLogsDialog(
+    BuildContext context,
+    GeofenceState geofenceState,
+    GeofenceNotifier geofenceNotifier,
+  ) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (_) => Container(
-        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.65),
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.65,
+        ),
         padding: const EdgeInsets.all(20),
         decoration: const BoxDecoration(
           color: AppTheme.surface,
@@ -49,18 +55,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               children: [
                 const Row(
                   children: [
-                    Icon(Icons.notifications_active_rounded, color: AppTheme.primary, size: 22),
+                    Icon(
+                      Icons.notifications_active_rounded,
+                      color: AppTheme.primary,
+                      size: 22,
+                    ),
                     SizedBox(width: 10),
                     Text(
                       "GEOFENCE OLAY GÜNLÜĞÜ",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.textPrimary),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: AppTheme.textPrimary,
+                      ),
                     ),
                   ],
                 ),
                 if (geofenceState.eventsHistory.isNotEmpty)
                   TextButton(
                     onPressed: () => geofenceNotifier.clearEvents(),
-                    child: const Text("Temizle", style: TextStyle(color: AppTheme.spoofed, fontSize: 12)),
+                    child: const Text(
+                      "Temizle",
+                      style: TextStyle(color: AppTheme.spoofed, fontSize: 12),
+                    ),
                   ),
               ],
             ),
@@ -91,14 +108,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         color: AppTheme.cardBg,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isEnter ? AppTheme.safe.withAlpha(80) : AppTheme.suspicious.withAlpha(80),
+                          color: isEnter
+                              ? AppTheme.safe.withAlpha(80)
+                              : AppTheme.suspicious.withAlpha(80),
                         ),
                       ),
                       child: Row(
                         children: [
                           Icon(
-                            isEnter ? Icons.login_rounded : Icons.logout_rounded,
-                            color: isEnter ? AppTheme.safe : AppTheme.suspicious,
+                            isEnter
+                                ? Icons.login_rounded
+                                : Icons.logout_rounded,
+                            color: isEnter
+                                ? AppTheme.safe
+                                : AppTheme.suspicious,
                             size: 24,
                           ),
                           const SizedBox(width: 12),
@@ -107,24 +130,34 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  isEnter ? "HEDEFE GİRİLDİ (Check-in Aktif)" : "HEDEFTEN ÇIKILDI",
+                                  isEnter
+                                      ? "HEDEFE GİRİLDİ (Check-in Aktif)"
+                                      : "HEDEFTEN ÇIKILDI",
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 13,
-                                    color: isEnter ? AppTheme.safe : AppTheme.suspicious,
+                                    color: isEnter
+                                        ? AppTheme.safe
+                                        : AppTheme.suspicious,
                                   ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
                                   "${event.targetName} • Mesafe: ${event.distanceMeters.toInt()}m",
-                                  style: const TextStyle(fontSize: 12, color: AppTheme.textPrimary),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppTheme.textPrimary,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
                           Text(
                             "${event.timestamp.hour.toString().padLeft(2, '0')}:${event.timestamp.minute.toString().padLeft(2, '0')}:${event.timestamp.second.toString().padLeft(2, '0')}",
-                            style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppTheme.textSecondary,
+                            ),
                           ),
                         ],
                       ),
@@ -142,7 +175,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget build(BuildContext context) {
     final target = ref.watch(targetLocationProvider);
     final targetNotifier = ref.read(targetLocationProvider.notifier);
-    
+
     // Watch Geofence Provider
     final geofenceState = ref.watch(geofenceProvider);
     final geofenceNotifier = ref.read(geofenceProvider.notifier);
@@ -152,9 +185,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final simNotifier = ref.read(simulationProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("AYARLAR VE HEDEFLER"),
-      ),
+      appBar: AppBar(title: const Text("AYARLAR VE HEDEFLER")),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
@@ -217,7 +248,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           lat = 41.0370;
                           lng = 28.9850;
                         }
-                        
+
                         targetNotifier.state = TargetLocation(
                           name: val,
                           latitude: lat,
@@ -297,13 +328,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
                 const Divider(height: 1, color: Color(0xFF2A3547)),
                 ListTile(
-                  leading: const Icon(Icons.notifications_active_rounded, color: AppTheme.primary),
+                  leading: const Icon(
+                    Icons.notifications_active_rounded,
+                    color: AppTheme.primary,
+                  ),
                   title: const Text(
                     "Test Bildirimi Gönder",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textPrimary,
+                    ),
                   ),
-                  subtitle: const Text("Cihazda push bildirim izinlerini ve servisini test eder.", style: TextStyle(fontSize: 12)),
-                  trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppTheme.textSecondary),
+                  subtitle: const Text(
+                    "Cihazda push bildirim izinlerini ve servisini test eder.",
+                    style: TextStyle(fontSize: 12),
+                  ),
+                  trailing: const Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 14,
+                    color: AppTheme.textSecondary,
+                  ),
                   onTap: () async {
                     await NotificationService().showTestNotification();
                     if (context.mounted) {
@@ -318,17 +363,32 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
                 const Divider(height: 1, color: Color(0xFF2A3547)),
                 ListTile(
-                  leading: const Icon(Icons.history_rounded, color: AppTheme.secondary),
+                  leading: const Icon(
+                    Icons.history_rounded,
+                    color: AppTheme.secondary,
+                  ),
                   title: const Text(
                     "Geofence Olay Geçmişi",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textPrimary,
+                    ),
                   ),
                   subtitle: Text(
                     "${geofenceState.eventsHistory.length} giriş/çıkış olayı kaydedildi",
                     style: const TextStyle(fontSize: 12),
                   ),
-                  trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppTheme.textSecondary),
-                  onTap: () => _showGeofenceLogsDialog(context, geofenceState, geofenceNotifier),
+                  trailing: const Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 14,
+                    color: AppTheme.textSecondary,
+                  ),
+                  onTap: () => _showGeofenceLogsDialog(
+                    context,
+                    geofenceState,
+                    geofenceNotifier,
+                  ),
                 ),
               ],
             ),
@@ -381,7 +441,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                   ),
                   subtitle: const Text("Maksimum hız limiti: 150 km/s"),
-                  trailing: const Icon(Icons.speed_rounded, color: AppTheme.primary),
+                  trailing: const Icon(
+                    Icons.speed_rounded,
+                    color: AppTheme.primary,
+                  ),
                   onTap: () {},
                 ),
               ],
@@ -411,7 +474,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       Expanded(
                         child: ElevatedButton.icon(
                           icon: const Icon(Icons.login_rounded, size: 16),
-                          label: const Text("Alana Giriş Simüle Et", style: TextStyle(fontSize: 12)),
+                          label: const Text(
+                            "Alana Giriş Simüle Et",
+                            style: TextStyle(fontSize: 12),
+                          ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppTheme.safe,
                             foregroundColor: Colors.white,
@@ -422,7 +488,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text("📍 Hedef alana giriş simüle edildi & bildirim gönderildi!"),
+                                  content: Text(
+                                    "📍 Hedef alana giriş simüle edildi & bildirim gönderildi!",
+                                  ),
                                   backgroundColor: AppTheme.safe,
                                 ),
                               );
@@ -434,7 +502,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       Expanded(
                         child: ElevatedButton.icon(
                           icon: const Icon(Icons.logout_rounded, size: 16),
-                          label: const Text("Alandan Çıkış Simüle Et", style: TextStyle(fontSize: 12)),
+                          label: const Text(
+                            "Alandan Çıkış Simüle Et",
+                            style: TextStyle(fontSize: 12),
+                          ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppTheme.suspicious,
                             foregroundColor: Colors.black,
@@ -445,7 +516,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text("🚪 Hedef alandan çıkış simüle edildi & bildirim gönderildi!"),
+                                  content: Text(
+                                    "🚪 Hedef alandan çıkış simüle edildi & bildirim gönderildi!",
+                                  ),
                                   backgroundColor: AppTheme.suspicious,
                                 ),
                               );
@@ -482,7 +555,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   value: simConfig.simulateSensorInconsistency,
                   activeThumbColor: AppTheme.suspicious,
                   title: const Text("Sensör Tutarsızlığı Tetikle (K5)"),
-                  onChanged: (val) => simNotifier.toggleSensorInconsistency(val),
+                  onChanged: (val) =>
+                      simNotifier.toggleSensorInconsistency(val),
                 ),
                 const Divider(height: 1, color: Color(0xFF2A3547)),
                 SwitchListTile(
@@ -516,7 +590,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 SwitchListTile(
                   value: simConfig.simulatePlayIntegrityFail,
                   activeThumbColor: AppTheme.suspicious,
-                  title: const Text("Play Integrity / App Attest İhlali Tetikle"),
+                  title: const Text(
+                    "Play Integrity / App Attest İhlali Tetikle",
+                  ),
                   onChanged: (val) => simNotifier.togglePlayIntegrityFail(val),
                 ),
                 const Divider(height: 1, color: Color(0xFF2A3547)),

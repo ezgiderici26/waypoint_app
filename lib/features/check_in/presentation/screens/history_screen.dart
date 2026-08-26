@@ -37,13 +37,15 @@ class HistoryScreen extends ConsumerWidget {
                   duration: Duration(seconds: 1),
                 ),
               );
-              final success = await ref.read(checkInHistoryProvider.notifier).syncPendingRecords();
+              final success = await ref
+                  .read(checkInHistoryProvider.notifier)
+                  .syncPendingRecords();
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      success 
-                          ? "Kuyruk başarıyla sunucuyla eşitlendi!" 
+                      success
+                          ? "Kuyruk başarıyla sunucuyla eşitlendi!"
                           : "Ağ Hatası: Bazı kayıtlar eşitlenemedi, kuyrukta bekletiliyor.",
                     ),
                     backgroundColor: success ? AppTheme.safe : AppTheme.spoofed,
@@ -78,7 +80,7 @@ class HistoryScreen extends ConsumerWidget {
               itemBuilder: (context, index) {
                 final log = logs[index];
                 final int risk = log.riskScore;
-                
+
                 Color statusColor;
                 String statusText;
                 if (log.isBlocked) {
@@ -99,7 +101,8 @@ class HistoryScreen extends ConsumerWidget {
                 String formattedTime = log.timestamp;
                 try {
                   final parsed = DateTime.parse(log.timestamp);
-                  formattedTime = "${parsed.day.toString().padLeft(2, '0')}.${parsed.month.toString().padLeft(2, '0')}.${parsed.year} ${parsed.hour.toString().padLeft(2, '0')}:${parsed.minute.toString().padLeft(2, '0')}";
+                  formattedTime =
+                      "${parsed.day.toString().padLeft(2, '0')}.${parsed.month.toString().padLeft(2, '0')}.${parsed.year} ${parsed.hour.toString().padLeft(2, '0')}:${parsed.minute.toString().padLeft(2, '0')}";
                 } catch (_) {}
 
                 return Card(
@@ -125,11 +128,17 @@ class HistoryScreen extends ConsumerWidget {
                             ),
                             const SizedBox(width: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: statusColor.withAlpha(26),
                                 borderRadius: BorderRadius.circular(6),
-                                border: Border.all(color: statusColor, width: 1),
+                                border: Border.all(
+                                  color: statusColor,
+                                  width: 1,
+                                ),
                               ),
                               child: Text(
                                 statusText,
@@ -178,22 +187,32 @@ class HistoryScreen extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
-                                color: risk >= 35 ? AppTheme.spoofed : AppTheme.textPrimary,
+                                color: risk >= 35
+                                    ? AppTheme.spoofed
+                                    : AppTheme.textPrimary,
                               ),
                             ),
                             Row(
                               children: [
                                 Icon(
-                                  log.isSynced ? Icons.cloud_done_rounded : Icons.cloud_off_rounded,
+                                  log.isSynced
+                                      ? Icons.cloud_done_rounded
+                                      : Icons.cloud_off_rounded,
                                   size: 16,
-                                  color: log.isSynced ? AppTheme.primary : AppTheme.suspicious,
+                                  color: log.isSynced
+                                      ? AppTheme.primary
+                                      : AppTheme.suspicious,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  log.isSynced ? "Sunucuyla Eşleşti" : "Kuyrukta Bekliyor",
+                                  log.isSynced
+                                      ? "Sunucuyla Eşleşti"
+                                      : "Kuyrukta Bekliyor",
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: log.isSynced ? AppTheme.primary : AppTheme.suspicious,
+                                    color: log.isSynced
+                                        ? AppTheme.primary
+                                        : AppTheme.suspicious,
                                   ),
                                 ),
                               ],

@@ -29,9 +29,7 @@ class _HomeShellState extends State<HomeShell> {
       body: _screens[_selectedIndex],
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
-          border: Border(
-            top: BorderSide(color: Color(0xFF2A3547), width: 1),
-          ),
+          border: Border(top: BorderSide(color: Color(0xFF2A3547), width: 1)),
         ),
         child: BottomNavigationBar(
           currentIndex: _selectedIndex,

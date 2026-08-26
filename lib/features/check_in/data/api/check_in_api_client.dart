@@ -27,13 +27,9 @@ class CheckInApiClient {
       // 2. Send the encrypted payload to the server
       final response = await _dio.post(
         'https://669e46a79a14b77511eb96cb.mockapi.io/api/v1/checkin',
-        data: {
-          'encryptedData': encryptedString,
-        },
+        data: {'encryptedData': encryptedString},
         options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: {'Content-Type': 'application/json'},
           receiveTimeout: const Duration(seconds: 5),
           sendTimeout: const Duration(seconds: 5),
         ),
@@ -49,7 +45,9 @@ class CheckInApiClient {
     } on DioException catch (e) {
       // Fallback: If mockapi.io is rate-limited, expired (404), or host is unreachable,
       // log the network error and automatically fallback to simulated success so testing is not blocked!
-      developer.log("Real MockAPI request failed: ${e.message}. Falling back to simulated network success.");
+      developer.log(
+        "Real MockAPI request failed: ${e.message}. Falling back to simulated network success.",
+      );
       return; // Return normally to mark as synced successfully
     }
   }

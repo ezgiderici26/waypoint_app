@@ -11,10 +11,13 @@ class BiometricService {
 
   Future<bool> isBiometricsAvailable() async {
     final sim = _ref.read(simulationProvider);
-    if (sim.simulateEmulator) return true; // Simulate available on emulator for test
+    if (sim.simulateEmulator) {
+      return true; // Simulate available on emulator for test
+    }
     try {
       final bool canAuthenticateWithBiometrics = await _auth.canCheckBiometrics;
-      final bool canAuthenticate = canAuthenticateWithBiometrics || await _auth.isDeviceSupported();
+      final bool canAuthenticate =
+          canAuthenticateWithBiometrics || await _auth.isDeviceSupported();
       return canAuthenticate;
     } catch (_) {
       return false;
@@ -34,7 +37,8 @@ class BiometricService {
 
     try {
       final bool didAuthenticate = await _auth.authenticate(
-        localizedReason: 'Check-in işlemini tamamlamak için biyometrik kimliğinizi doğrulayın.',
+        localizedReason:
+            'Check-in işlemini tamamlamak için biyometrik kimliğinizi doğrulayın.',
         options: const AuthenticationOptions(
           biometricOnly: true,
           stickyAuth: true,

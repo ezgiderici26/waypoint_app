@@ -3,11 +3,7 @@ import '../../../../core/services/notification_service.dart';
 import '../../domain/entities/location_data.dart';
 import 'location_providers.dart';
 
-enum GeofenceStatus {
-  unknown,
-  inside,
-  outside,
-}
+enum GeofenceStatus { unknown, inside, outside }
 
 class GeofenceEvent {
   final String type; // 'ENTER' or 'EXIT'
@@ -88,7 +84,10 @@ class GeofenceNotifier extends StateNotifier<GeofenceState> {
     });
 
     // 2. Listen to live/background location stream updates
-    _ref.listen<AsyncValue<LocationData>>(locationStreamProvider, (previous, next) {
+    _ref.listen<AsyncValue<LocationData>>(locationStreamProvider, (
+      previous,
+      next,
+    ) {
       next.whenData((LocationData location) {
         _evaluateGeofence(location);
       });
@@ -108,11 +107,14 @@ class GeofenceNotifier extends StateNotifier<GeofenceState> {
     );
 
     final bool isNowInside = distance <= target.radius;
-    final GeofenceStatus newStatus = isNowInside ? GeofenceStatus.inside : GeofenceStatus.outside;
+    final GeofenceStatus newStatus = isNowInside
+        ? GeofenceStatus.inside
+        : GeofenceStatus.outside;
     final GeofenceStatus previousStatus = state.status;
 
     // Check transition: ENTER
-    if (newStatus == GeofenceStatus.inside && previousStatus != GeofenceStatus.inside) {
+    if (newStatus == GeofenceStatus.inside &&
+        previousStatus != GeofenceStatus.inside) {
       final event = GeofenceEvent(
         type: 'ENTER',
         targetName: target.name,
@@ -132,7 +134,8 @@ class GeofenceNotifier extends StateNotifier<GeofenceState> {
       );
     }
     // Check transition: EXIT
-    else if (newStatus == GeofenceStatus.outside && previousStatus == GeofenceStatus.inside) {
+    else if (newStatus == GeofenceStatus.outside &&
+        previousStatus == GeofenceStatus.inside) {
       final event = GeofenceEvent(
         type: 'EXIT',
         targetName: target.name,
@@ -153,10 +156,7 @@ class GeofenceNotifier extends StateNotifier<GeofenceState> {
     }
     // Update distance without status transition
     else {
-      state = state.copyWith(
-        status: newStatus,
-        currentDistance: distance,
-      );
+      state = state.copyWith(status: newStatus, currentDistance: distance);
     }
   }
 
@@ -173,7 +173,10 @@ class GeofenceNotifier extends StateNotifier<GeofenceState> {
     );
 
     if (state.notificationsEnabled) {
-      await notifService.showGeofenceEnterNotification(target.name, target.radius);
+      await notifService.showGeofenceEnterNotification(
+        target.name,
+        target.radius,
+      );
     }
 
     state = state.copyWith(
@@ -217,6 +220,8 @@ class GeofenceNotifier extends StateNotifier<GeofenceState> {
   }
 }
 
-final geofenceProvider = StateNotifierProvider<GeofenceNotifier, GeofenceState>((ref) {
-  return GeofenceNotifier(ref);
-});
+final geofenceProvider = StateNotifierProvider<GeofenceNotifier, GeofenceState>(
+  (ref) {
+    return GeofenceNotifier(ref);
+  },
+);

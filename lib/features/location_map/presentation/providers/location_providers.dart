@@ -10,13 +10,7 @@ final locationRepositoryProvider = Provider<LocationRepository>((ref) {
 });
 
 // Permission state representation
-enum PermissionState {
-  checking,
-  denied,
-  deniedForever,
-  whileInUse,
-  always,
-}
+enum PermissionState { checking, denied, deniedForever, whileInUse, always }
 
 // Manage permission state
 class PermissionNotifier extends StateNotifier<PermissionState> {
@@ -41,7 +35,7 @@ class PermissionNotifier extends StateNotifier<PermissionState> {
   }
 
   Future<void> requestAlwaysPermission() async {
-    // Note: To request background (Always) permission on Android, 
+    // Note: To request background (Always) permission on Android,
     // "while in use" permission must be granted first.
     final LocationPermission permission = await Geolocator.requestPermission();
     state = _mapPermissionToState(permission);
@@ -67,9 +61,10 @@ class PermissionNotifier extends StateNotifier<PermissionState> {
   }
 }
 
-final permissionProvider = StateNotifierProvider<PermissionNotifier, PermissionState>((ref) {
-  return PermissionNotifier();
-});
+final permissionProvider =
+    StateNotifierProvider<PermissionNotifier, PermissionState>((ref) {
+      return PermissionNotifier();
+    });
 
 // Provide Live Location Stream
 final locationStreamProvider = StreamProvider<LocationData>((ref) {
@@ -77,7 +72,8 @@ final locationStreamProvider = StreamProvider<LocationData>((ref) {
   final permission = ref.watch(permissionProvider);
 
   // Only stream location if permission is granted
-  if (permission == PermissionState.whileInUse || permission == PermissionState.always) {
+  if (permission == PermissionState.whileInUse ||
+      permission == PermissionState.always) {
     return repository.getLocationStream();
   } else {
     return const Stream.empty();

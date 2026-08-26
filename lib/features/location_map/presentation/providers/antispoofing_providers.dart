@@ -12,14 +12,14 @@ class RiskState {
   final LocationData? currentLocation;
   final LocationData? previousLocation;
   final double computedSpeedKmh;
-  
+
   // Antispoofing Check Flags
-  final bool isOsMocked;          // K1
-  final bool isDevModeActive;      // K3
-  final bool isSpeedImpossible;    // K4
+  final bool isOsMocked; // K1
+  final bool isDevModeActive; // K3
+  final bool isSpeedImpossible; // K4
   final bool isSensorInconsistent; // K5
-  
-  final int riskScore;             // 0-100 normalized score
+
+  final int riskScore; // 0-100 normalized score
 
   const RiskState({
     this.currentLocation,
@@ -69,11 +69,11 @@ class RiskState {
 class AntispoofingNotifier extends StateNotifier<RiskState> {
   final Ref _ref;
   StreamSubscription<UserAccelerometerEvent>? _accelerometerSub;
-  
+
   // Sliding window to calculate device movement magnitude (K5)
   final List<double> _accelMagnitudes = [];
   static const int _maxWindowSize = 10;
-  
+
   bool _devModeActive = false;
 
   AntispoofingNotifier(this._ref) : super(RiskState.initial()) {
@@ -81,7 +81,10 @@ class AntispoofingNotifier extends StateNotifier<RiskState> {
     _checkDevMode();
 
     // Listen to locationStreamProvider to update risk calculations in real time
-    _ref.listen<AsyncValue<LocationData>>(locationStreamProvider, (previous, next) {
+    _ref.listen<AsyncValue<LocationData>>(locationStreamProvider, (
+      previous,
+      next,
+    ) {
       next.whenData((LocationData newLocation) {
         _evaluateLocation(newLocation);
       });
@@ -99,9 +102,13 @@ class AntispoofingNotifier extends StateNotifier<RiskState> {
     if (Platform.environment.containsKey('FLUTTER_TEST')) {
       return;
     }
-    
-    _accelerometerSub = userAccelerometerEventStream().listen((UserAccelerometerEvent event) {
-      final double magnitude = sqrt(event.x * event.x + event.y * event.y + event.z * event.z);
+
+    _accelerometerSub = userAccelerometerEventStream().listen((
+      UserAccelerometerEvent event,
+    ) {
+      final double magnitude = sqrt(
+        event.x * event.x + event.y * event.y + event.z * event.z,
+      );
       _accelMagnitudes.add(magnitude);
       if (_accelMagnitudes.length > _maxWindowSize) {
         _accelMagnitudes.removeAt(0);
@@ -138,9 +145,11 @@ class AntispoofingNotifier extends StateNotifier<RiskState> {
         newLocation.longitude,
       );
 
-      final double timeSeconds = newLocation.timestamp
-          .difference(prevLocation.timestamp)
-          .inMilliseconds / 1000.0;
+      final double timeSeconds =
+          newLocation.timestamp
+              .difference(prevLocation.timestamp)
+              .inMilliseconds /
+          1000.0;
 
       if (timeSeconds > 0.5) {
         final double speedMps = distanceMeters / timeSeconds;
@@ -154,10 +163,13 @@ class AntispoofingNotifier extends StateNotifier<RiskState> {
         // K5: Sensor Cross-Validation
         final double prevSpeedMps = prevLocation.speed;
         final double currentSpeedMps = newLocation.speed;
-        final double gpsAcceleration = (currentSpeedMps - prevSpeedMps).abs() / timeSeconds;
+        final double gpsAcceleration =
+            (currentSpeedMps - prevSpeedMps).abs() / timeSeconds;
 
         if (gpsAcceleration > 0.5 && _accelMagnitudes.isNotEmpty) {
-          final double avgAccel = _accelMagnitudes.reduce((a, b) => a + b) / _accelMagnitudes.length;
+          final double avgAccel =
+              _accelMagnitudes.reduce((a, b) => a + b) /
+              _accelMagnitudes.length;
           if (avgAccel < 0.1) {
             sensorInconsistent = true;
           }
@@ -176,12 +188,14 @@ class AntispoofingNotifier extends StateNotifier<RiskState> {
     }
 
     // Check OS Mock Flag (K1)
-    final bool osMocked = sim.simulateMockLocation ? true : newLocation.isMocked;
+    final bool osMocked = sim.simulateMockLocation
+        ? true
+        : newLocation.isMocked;
     final bool devModeActive = sim.simulateDevMode ? true : _devModeActive;
 
     // Calculate Normalized Weighted Risk Score (0-100)
     int score = 0;
-    
+
     if (osMocked) {
       score += 75;
     }
@@ -216,6 +230,7 @@ class AntispoofingNotifier extends StateNotifier<RiskState> {
   }
 }
 
-final antispoofingProvider = StateNotifierProvider<AntispoofingNotifier, RiskState>((ref) {
-  return AntispoofingNotifier(ref);
-});
+final antispoofingProvider =
+    StateNotifierProvider<AntispoofingNotifier, RiskState>((ref) {
+      return AntispoofingNotifier(ref);
+    });

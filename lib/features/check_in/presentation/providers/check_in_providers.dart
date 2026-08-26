@@ -23,7 +23,10 @@ class CheckInHistoryNotifier extends StateNotifier<List<CheckInRecord>> {
     _loadRecords();
 
     // Start periodic sync worker to retry offline items every 30 seconds
-    _syncTimer = Timer.periodic(const Duration(seconds: 30), (_) => syncPendingRecords());
+    _syncTimer = Timer.periodic(
+      const Duration(seconds: 30),
+      (_) => syncPendingRecords(),
+    );
   }
 
   void _loadRecords() {
@@ -35,7 +38,9 @@ class CheckInHistoryNotifier extends StateNotifier<List<CheckInRecord>> {
           if (raw is String) {
             // Decrypt AES encrypted record JSON string
             final decrypted = EncryptionHelper.decrypt(raw);
-            final Map<String, dynamic> json = Map<String, dynamic>.from(jsonDecode(decrypted));
+            final Map<String, dynamic> json = Map<String, dynamic>.from(
+              jsonDecode(decrypted),
+            );
             loaded.add(CheckInRecord.fromJson(json));
           } else if (raw is Map) {
             // Fallback for legacy plain text map structure
@@ -78,7 +83,7 @@ class CheckInHistoryNotifier extends StateNotifier<List<CheckInRecord>> {
     final jsonString = jsonEncode(record.toJson());
     final encryptedData = EncryptionHelper.encrypt(jsonString);
     await _box.put(record.id, encryptedData);
-    
+
     // 2. Reload history state to update UI instantly
     _loadRecords();
 
@@ -127,7 +132,7 @@ class CheckInHistoryNotifier extends StateNotifier<List<CheckInRecord>> {
           developer.log("Check-in Eşitleme Hatası (ID: ${record.id}): $e");
         }
       }
-      
+
       // Reload updated records into UI state
       _loadRecords();
       return allSuccess;
@@ -151,7 +156,8 @@ final apiClientProvider = Provider<CheckInApiClient>((ref) {
   return CheckInApiClient(dio, ref);
 });
 
-final checkInHistoryProvider = StateNotifierProvider<CheckInHistoryNotifier, List<CheckInRecord>>((ref) {
-  final apiClient = ref.watch(apiClientProvider);
-  return CheckInHistoryNotifier(apiClient);
-});
+final checkInHistoryProvider =
+    StateNotifierProvider<CheckInHistoryNotifier, List<CheckInRecord>>((ref) {
+      final apiClient = ref.watch(apiClientProvider);
+      return CheckInHistoryNotifier(apiClient);
+    });

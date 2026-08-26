@@ -62,12 +62,14 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
 
     // Listen for cluster selection to open detail modal
     ref.listen<HeatmapState>(heatmapNotifierProvider, (previous, next) {
-      if (next.selectedCluster != null && previous?.selectedCluster != next.selectedCluster) {
+      if (next.selectedCluster != null &&
+          previous?.selectedCluster != next.selectedCluster) {
         showModalBottomSheet(
           context: context,
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
-          builder: (_) => HeatmapPointDetailDialog(cluster: next.selectedCluster!),
+          builder: (_) =>
+              HeatmapPointDetailDialog(cluster: next.selectedCluster!),
         ).whenComplete(() {
           heatmapNotifier.clearSelection();
         });
@@ -86,7 +88,9 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text("İstanbul geneli 22 demo check-in kaydı yüklendi!"),
+                    content: Text(
+                      "İstanbul geneli 22 demo check-in kaydı yüklendi!",
+                    ),
                     backgroundColor: AppTheme.safe,
                   ),
                 );
@@ -148,7 +152,8 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
                         label: "Yoğunluk",
                         mode: HeatmapMode.density,
                         currentMode: heatmapState.mode,
-                        onTap: () => heatmapNotifier.setMode(HeatmapMode.density),
+                        onTap: () =>
+                            heatmapNotifier.setMode(HeatmapMode.density),
                         activeColor: const Color(0xFFFF9900),
                       ),
                       _buildModeButton(
@@ -164,7 +169,8 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
                         label: "Noktasal",
                         mode: HeatmapMode.points,
                         currentMode: heatmapState.mode,
-                        onTap: () => heatmapNotifier.setMode(HeatmapMode.points),
+                        onTap: () =>
+                            heatmapNotifier.setMode(HeatmapMode.points),
                         activeColor: AppTheme.primary,
                       ),
                     ],
@@ -180,31 +186,40 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
                       _buildFilterChip(
                         label: "Tümü (${stats.totalRecords})",
                         isSelected: heatmapState.riskFilter == RiskFilter.all,
-                        onTap: () => heatmapNotifier.setRiskFilter(RiskFilter.all),
+                        onTap: () =>
+                            heatmapNotifier.setRiskFilter(RiskFilter.all),
                       ),
                       const SizedBox(width: 6),
                       _buildFilterChip(
                         label: "🟢 Güvenli (${stats.safeRecords})",
-                        isSelected: heatmapState.riskFilter == RiskFilter.safeOnly,
-                        onTap: () => heatmapNotifier.setRiskFilter(RiskFilter.safeOnly),
+                        isSelected:
+                            heatmapState.riskFilter == RiskFilter.safeOnly,
+                        onTap: () =>
+                            heatmapNotifier.setRiskFilter(RiskFilter.safeOnly),
                         accentColor: AppTheme.safe,
                       ),
                       const SizedBox(width: 6),
                       _buildFilterChip(
                         label: "🔴 Tehditler (${stats.riskyOrBlockedRecords})",
-                        isSelected: heatmapState.riskFilter == RiskFilter.riskyOnly,
-                        onTap: () => heatmapNotifier.setRiskFilter(RiskFilter.riskyOnly),
+                        isSelected:
+                            heatmapState.riskFilter == RiskFilter.riskyOnly,
+                        onTap: () =>
+                            heatmapNotifier.setRiskFilter(RiskFilter.riskyOnly),
                         accentColor: AppTheme.spoofed,
                       ),
                       const SizedBox(width: 6),
                       _buildFilterChip(
                         label: "⏱️ Son 24s",
-                        isSelected: heatmapState.timeFilter == TimeFilter.last24Hours,
+                        isSelected:
+                            heatmapState.timeFilter == TimeFilter.last24Hours,
                         onTap: () {
-                          if (heatmapState.timeFilter == TimeFilter.last24Hours) {
+                          if (heatmapState.timeFilter ==
+                              TimeFilter.last24Hours) {
                             heatmapNotifier.setTimeFilter(TimeFilter.allTime);
                           } else {
-                            heatmapNotifier.setTimeFilter(TimeFilter.last24Hours);
+                            heatmapNotifier.setTimeFilter(
+                              TimeFilter.last24Hours,
+                            );
                           }
                         },
                       ),
@@ -229,10 +244,17 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
                     child: ActionChip(
                       backgroundColor: AppTheme.surface.withAlpha(220),
                       side: const BorderSide(color: Color(0xFF2A3547)),
-                      avatar: const Icon(Icons.near_me_rounded, size: 14, color: AppTheme.primary),
+                      avatar: const Icon(
+                        Icons.near_me_rounded,
+                        size: 14,
+                        color: AppTheme.primary,
+                      ),
                       label: Text(
                         entry.key,
-                        style: const TextStyle(fontSize: 12, color: AppTheme.textPrimary),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.textPrimary,
+                        ),
                       ),
                       onPressed: () => _navigateToLocation(entry.value),
                     ),
@@ -251,7 +273,10 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
               onTap: _openStatsSheet,
               borderRadius: BorderRadius.circular(16),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: AppTheme.surface.withAlpha(245),
                   borderRadius: BorderRadius.circular(16),
@@ -275,7 +300,11 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
                             color: AppTheme.primary.withAlpha(30),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.analytics_rounded, color: AppTheme.primary, size: 18),
+                          child: const Icon(
+                            Icons.analytics_rounded,
+                            color: AppTheme.primary,
+                            size: 18,
+                          ),
                         ),
                         const SizedBox(width: 10),
                         Column(
@@ -312,7 +341,11 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
                           ),
                         ),
                         SizedBox(width: 4),
-                        Icon(Icons.arrow_forward_ios_rounded, color: AppTheme.primary, size: 12),
+                        Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          color: AppTheme.primary,
+                          size: 12,
+                        ),
                       ],
                     ),
                   ],
@@ -350,12 +383,18 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
           decoration: BoxDecoration(
             color: isSelected ? activeColor.withAlpha(40) : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
-            border: isSelected ? Border.all(color: activeColor, width: 1.5) : null,
+            border: isSelected
+                ? Border.all(color: activeColor, width: 1.5)
+                : null,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 16, color: isSelected ? activeColor : AppTheme.textSecondary),
+              Icon(
+                icon,
+                size: 16,
+                color: isSelected ? activeColor : AppTheme.textSecondary,
+              ),
               const SizedBox(width: 6),
               Text(
                 label,
@@ -384,7 +423,9 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? effectiveColor.withAlpha(35) : AppTheme.surface.withAlpha(220),
+          color: isSelected
+              ? effectiveColor.withAlpha(35)
+              : AppTheme.surface.withAlpha(220),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected ? effectiveColor : const Color(0xFF2A3547),

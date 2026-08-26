@@ -50,4 +50,7 @@ app.*.map.json
 secrets.properties
 ios/Runner/Secrets.plist
 android/local.properties
+.kotlin/
+android/.kotlin/
+
 

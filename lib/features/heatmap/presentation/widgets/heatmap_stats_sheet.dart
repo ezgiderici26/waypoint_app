@@ -18,9 +18,7 @@ class HeatmapStatsSheet extends ConsumerWidget {
       decoration: const BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        border: Border(
-          top: BorderSide(color: Color(0xFF2A3547), width: 1.5),
-        ),
+        border: Border(top: BorderSide(color: Color(0xFF2A3547), width: 1.5)),
       ),
       child: SafeArea(
         top: false,
@@ -48,7 +46,11 @@ class HeatmapStatsSheet extends ConsumerWidget {
                 children: [
                   const Row(
                     children: [
-                      Icon(Icons.analytics_rounded, color: AppTheme.primary, size: 24),
+                      Icon(
+                        Icons.analytics_rounded,
+                        color: AppTheme.primary,
+                        size: 24,
+                      ),
                       SizedBox(width: 10),
                       Text(
                         "YÖNETİCİ ISI & ANALİTİK",
@@ -62,7 +64,10 @@ class HeatmapStatsSheet extends ConsumerWidget {
                     ],
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close_rounded, color: AppTheme.textSecondary),
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      color: AppTheme.textSecondary,
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
@@ -108,9 +113,11 @@ class HeatmapStatsSheet extends ConsumerWidget {
                       title: "Ort. Risk Skoru",
                       value: "${stats.averageRiskScore.toStringAsFixed(0)}/100",
                       icon: Icons.speed_rounded,
-                      color: stats.averageRiskScore < 35 
-                          ? AppTheme.safe 
-                          : (stats.averageRiskScore < 70 ? AppTheme.suspicious : AppTheme.spoofed),
+                      color: stats.averageRiskScore < 35
+                          ? AppTheme.safe
+                          : (stats.averageRiskScore < 70
+                                ? AppTheme.suspicious
+                                : AppTheme.spoofed),
                     ),
                   ),
                 ],
@@ -132,14 +139,28 @@ class HeatmapStatsSheet extends ConsumerWidget {
                       children: [
                         const Row(
                           children: [
-                            Icon(Icons.whatshot_rounded, color: Color(0xFFFF9900), size: 20),
+                            Icon(
+                              Icons.whatshot_rounded,
+                              color: Color(0xFFFF9900),
+                              size: 20,
+                            ),
                             SizedBox(width: 8),
-                            Text("En Yoğun Hotspot:", style: TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
+                            Text(
+                              "En Yoğun Hotspot:",
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: AppTheme.textSecondary,
+                              ),
+                            ),
                           ],
                         ),
                         Text(
                           "${stats.topHotspotName} (${stats.topHotspotCount} Adet)",
-                          style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textPrimary, fontSize: 13),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.textPrimary,
+                            fontSize: 13,
+                          ),
                         ),
                       ],
                     ),
@@ -149,14 +170,28 @@ class HeatmapStatsSheet extends ConsumerWidget {
                       children: [
                         const Row(
                           children: [
-                            Icon(Icons.vpn_lock_rounded, color: AppTheme.suspicious, size: 20),
+                            Icon(
+                              Icons.vpn_lock_rounded,
+                              color: AppTheme.suspicious,
+                              size: 20,
+                            ),
                             SizedBox(width: 8),
-                            Text("Mock GPS / VPN İhlalleri:", style: TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
+                            Text(
+                              "Mock GPS / VPN İhlalleri:",
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: AppTheme.textSecondary,
+                              ),
+                            ),
                           ],
                         ),
                         Text(
                           "${stats.vpnOrMockDetections} Olay Yakalandı",
-                          style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.spoofed, fontSize: 13),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.spoofed,
+                            fontSize: 13,
+                          ),
                         ),
                       ],
                     ),
@@ -171,11 +206,17 @@ class HeatmapStatsSheet extends ConsumerWidget {
                 children: [
                   const Text(
                     "Isı Yarıçapı & Yayılım Çarpanı",
-                    style: TextStyle(fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textPrimary,
+                    ),
                   ),
                   Text(
                     "${(state.radiusMultiplier * 100).toInt()}%",
-                    style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      color: AppTheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -196,7 +237,10 @@ class HeatmapStatsSheet extends ConsumerWidget {
                   Expanded(
                     child: ElevatedButton.icon(
                       icon: const Icon(Icons.science_rounded, size: 18),
-                      label: const Text("Demo Küme Ekle", style: TextStyle(fontSize: 13)),
+                      label: const Text(
+                        "Demo Küme Ekle",
+                        style: TextStyle(fontSize: 13),
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primary,
                         foregroundColor: AppTheme.background,
@@ -207,7 +251,9 @@ class HeatmapStatsSheet extends ConsumerWidget {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text("İstanbul geneli 22 adet demo check-in kümesi yüklendi!"),
+                              content: Text(
+                                "İstanbul geneli 22 adet demo check-in kümesi yüklendi!",
+                              ),
                               backgroundColor: AppTheme.safe,
                             ),
                           );
@@ -218,18 +264,32 @@ class HeatmapStatsSheet extends ConsumerWidget {
                   ),
                   const SizedBox(width: 10),
                   OutlinedButton.icon(
-                    icon: const Icon(Icons.delete_sweep_rounded, size: 18, color: AppTheme.spoofed),
-                    label: const Text("Temizle", style: TextStyle(fontSize: 13, color: AppTheme.spoofed)),
+                    icon: const Icon(
+                      Icons.delete_sweep_rounded,
+                      size: 18,
+                      color: AppTheme.spoofed,
+                    ),
+                    label: const Text(
+                      "Temizle",
+                      style: TextStyle(fontSize: 13, color: AppTheme.spoofed),
+                    ),
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AppTheme.spoofed),
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 16,
+                      ),
                     ),
                     onPressed: () async {
-                      await ref.read(checkInHistoryProvider.notifier).clearAllRecords();
+                      await ref
+                          .read(checkInHistoryProvider.notifier)
+                          .clearAllRecords();
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text("Tüm check-in veritabanı temizlendi."),
+                            content: Text(
+                              "Tüm check-in veritabanı temizlendi.",
+                            ),
                             backgroundColor: AppTheme.spoofed,
                           ),
                         );
@@ -267,7 +327,10 @@ class HeatmapStatsSheet extends ConsumerWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppTheme.textSecondary,
+                ),
               ),
               Icon(icon, color: color, size: 18),
             ],

@@ -73,9 +73,11 @@ class SecurityDashboardScreen extends ConsumerWidget {
                                   ],
                                 ),
                                 child: Icon(
-                                  riskScore < 35 
-                                      ? Icons.verified_user_rounded 
-                                      : (riskScore < 70 ? Icons.gpp_maybe_rounded : Icons.gpp_bad_rounded),
+                                  riskScore < 35
+                                      ? Icons.verified_user_rounded
+                                      : (riskScore < 70
+                                            ? Icons.gpp_maybe_rounded
+                                            : Icons.gpp_bad_rounded),
                                   size: 36,
                                   color: scoreColor,
                                 ),
@@ -107,7 +109,7 @@ class SecurityDashboardScreen extends ConsumerWidget {
                             ],
                           ),
                           const SizedBox(height: 24),
-                          
+
                           // Linear progress indicator visual representation of risk
                           Row(
                             children: [
@@ -116,7 +118,8 @@ class SecurityDashboardScreen extends ConsumerWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           "Genel Cihaz Risk Skoru",
@@ -141,8 +144,13 @@ class SecurityDashboardScreen extends ConsumerWidget {
                                       borderRadius: BorderRadius.circular(4),
                                       child: LinearProgressIndicator(
                                         value: riskScore / 100,
-                                        backgroundColor: const Color(0xFF2A3547),
-                                        valueColor: AlwaysStoppedAnimation<Color>(scoreColor),
+                                        backgroundColor: const Color(
+                                          0xFF2A3547,
+                                        ),
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              scoreColor,
+                                            ),
                                         minHeight: 8,
                                       ),
                                     ),
@@ -156,7 +164,7 @@ class SecurityDashboardScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  
+
                   const Text(
                     "BÜTÜNLÜK KONTROLLERİ (INTEGRITY)",
                     style: TextStyle(
@@ -172,41 +180,56 @@ class SecurityDashboardScreen extends ConsumerWidget {
                   _buildSecurityRow(
                     icon: Icons.adb_rounded,
                     title: "Geliştirici Modu / USB Ayıklama",
-                    statusText: securityState.isDeveloperMode ? "Etkin (Riskli)" : "Kapalı",
+                    statusText: securityState.isDeveloperMode
+                        ? "Etkin (Riskli)"
+                        : "Kapalı",
                     isFailure: securityState.isDeveloperMode,
-                    description: "Aktif geliştirici modu, üçüncü parti uygulamaların konumu manipüle etmesini kolaylaştırır.",
+                    description:
+                        "Aktif geliştirici modu, üçüncü parti uygulamaların konumu manipüle etmesini kolaylaştırır.",
                   ),
                   const SizedBox(height: 12),
                   _buildSecurityRow(
                     icon: Icons.no_encryption_gmailerrorred_rounded,
                     title: "Root / Jailbreak Tespiti",
-                    statusText: securityState.isJailbroken ? "Root Edilmiş" : "Güvenli (Root Yok)",
+                    statusText: securityState.isJailbroken
+                        ? "Root Edilmiş"
+                        : "Güvenli (Root Yok)",
                     isFailure: securityState.isJailbroken,
-                    description: "Köklü erişim, sistem düzeyinde konum kütüphanelerinin manipüle edilmesini sağlar.",
+                    description:
+                        "Köklü erişim, sistem düzeyinde konum kütüphanelerinin manipüle edilmesini sağlar.",
                   ),
                   const SizedBox(height: 12),
                   _buildSecurityRow(
                     icon: Icons.devices_rounded,
                     title: "Emülatör Tespiti",
-                    statusText: securityState.isEmulator ? "Emülatör Algılandı" : "Fiziksel Cihaz",
+                    statusText: securityState.isEmulator
+                        ? "Emülatör Algılandı"
+                        : "Fiziksel Cihaz",
                     isFailure: securityState.isEmulator,
-                    description: "Uygulamanın sanal cihazlar yerine sadece fiziksel cihazlarda çalışması istenir.",
+                    description:
+                        "Uygulamanın sanal cihazlar yerine sadece fiziksel cihazlarda çalışması istenir.",
                   ),
                   const SizedBox(height: 12),
                   _buildSecurityRow(
                     icon: Icons.vpn_lock_rounded,
                     title: "VPN & Proxy Filtresi",
-                    statusText: securityState.isVpnActive ? "Aktif (tun0/ppp0)" : "Bağlantı Yok",
+                    statusText: securityState.isVpnActive
+                        ? "Aktif (tun0/ppp0)"
+                        : "Bağlantı Yok",
                     isFailure: securityState.isVpnActive,
-                    description: "VPN tünelleri ve proxy sunucuları ağ trafiğini ve IP tabanlı konumları şaşırtabilir.",
+                    description:
+                        "VPN tünelleri ve proxy sunucuları ağ trafiğini ve IP tabanlı konumları şaşırtabilir.",
                   ),
                   const SizedBox(height: 12),
                   _buildSecurityRow(
                     icon: Icons.shield_rounded,
                     title: "Play Integrity / App Attest",
-                    statusText: securityState.isIntegrityVerified ? "Doğrulandı" : "Bütünlük İhlali",
+                    statusText: securityState.isIntegrityVerified
+                        ? "Doğrulandı"
+                        : "Bütünlük İhlali",
                     isFailure: !securityState.isIntegrityVerified,
-                    description: "Karar: ${securityState.integrityVerdict}. Cihazın modifiye edilmediğini sunucu taraflı platform imzasıyla kriptografik doğrular.",
+                    description:
+                        "Karar: ${securityState.integrityVerdict}. Cihazın modifiye edilmediğini sunucu taraflı platform imzasıyla kriptografik doğrular.",
                   ),
                 ],
               ),
@@ -253,7 +276,10 @@ class SecurityDashboardScreen extends ConsumerWidget {
                 ),
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: statusColor.withAlpha(26),
                     borderRadius: BorderRadius.circular(20),

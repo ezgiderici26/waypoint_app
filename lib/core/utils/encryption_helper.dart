@@ -5,7 +5,7 @@ class EncryptionHelper {
   static final _key = Key.fromUtf8('waypointsafecheckinsecurekey2026');
   // 16-character IV
   static final _iv = IV.fromUtf8('waypointsecureiv');
-  
+
   static final _encrypter = Encrypter(AES(_key, mode: AESMode.cbc));
 
   /// Encrypts plain text using AES-256 CBC.
@@ -21,7 +21,10 @@ class EncryptionHelper {
   /// Decrypts cipher text back into plain text.
   static String decrypt(String cipherText) {
     try {
-      final decrypted = _encrypter.decrypt(Encrypted.fromBase64(cipherText), iv: _iv);
+      final decrypted = _encrypter.decrypt(
+        Encrypted.fromBase64(cipherText),
+        iv: _iv,
+      );
       return decrypted;
     } catch (_) {
       return cipherText;

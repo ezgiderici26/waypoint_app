@@ -24,7 +24,8 @@ class NotificationService {
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _notificationsPlugin =
+      FlutterLocalNotificationsPlugin();
   bool _isInitialized = false;
 
   final List<SentNotificationLog> _history = [];
@@ -32,7 +33,8 @@ class NotificationService {
 
   static const String geofenceChannelId = 'geofence_alerts_channel';
   static const String geofenceChannelName = 'Geofence Bölge Uyarıları';
-  static const String geofenceChannelDescription = 'Hedef kontrol alanına giriş ve çıkış bildirimleri';
+  static const String geofenceChannelDescription =
+      'Hedef kontrol alanına giriş ve çıkış bildirimleri';
 
   Future<void> initialize() async {
     if (_isInitialized) return;
@@ -46,11 +48,12 @@ class NotificationService {
       const AndroidInitializationSettings androidSettings =
           AndroidInitializationSettings('@mipmap/ic_launcher');
 
-      const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
-        requestAlertPermission: true,
-        requestBadgePermission: true,
-        requestSoundPermission: true,
-      );
+      const DarwinInitializationSettings iosSettings =
+          DarwinInitializationSettings(
+            requestAlertPermission: true,
+            requestBadgePermission: true,
+            requestSoundPermission: true,
+          );
 
       const InitializationSettings initSettings = InitializationSettings(
         android: androidSettings,
@@ -66,8 +69,10 @@ class NotificationService {
       );
 
       // Create Android Notification Channel
-      final androidPlugin = _notificationsPlugin.resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>();
+      final androidPlugin = _notificationsPlugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
       if (androidPlugin != null) {
         const AndroidNotificationChannel channel = AndroidNotificationChannel(
           geofenceChannelId,
@@ -110,15 +115,16 @@ class NotificationService {
       return;
     }
 
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      geofenceChannelId,
-      geofenceChannelName,
-      channelDescription: geofenceChannelDescription,
-      importance: Importance.max,
-      priority: Priority.high,
-      showWhen: true,
-      ticker: 'Waypoint Geofence',
-    );
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+          geofenceChannelId,
+          geofenceChannelName,
+          channelDescription: geofenceChannelDescription,
+          importance: Importance.max,
+          priority: Priority.high,
+          showWhen: true,
+          ticker: 'Waypoint Geofence',
+        );
 
     const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
       presentAlert: true,
@@ -146,22 +152,30 @@ class NotificationService {
   }
 
   /// Geofence Entry Notification
-  Future<void> showGeofenceEnterNotification(String targetName, double radiusMeters) async {
+  Future<void> showGeofenceEnterNotification(
+    String targetName,
+    double radiusMeters,
+  ) async {
     await showNotification(
       id: 101,
       title: "📍 Hedef Alana Girdiniz!",
-      body: "$targetName sınırları içindesiniz (${radiusMeters.toInt()}m yarıçap). Güvenli check-in yapabilirsiniz.",
+      body:
+          "$targetName sınırları içindesiniz (${radiusMeters.toInt()}m yarıçap). Güvenli check-in yapabilirsiniz.",
       payload: 'GEOFENCE_ENTER',
       type: 'ENTER',
     );
   }
 
   /// Geofence Exit Notification
-  Future<void> showGeofenceExitNotification(String targetName, double distanceMeters) async {
+  Future<void> showGeofenceExitNotification(
+    String targetName,
+    double distanceMeters,
+  ) async {
     await showNotification(
       id: 102,
       title: "🚪 Hedef Alandan Çıktınız",
-      body: "$targetName bölgesinden uzaklaştınız. (Şu anki mesafe: ${distanceMeters.toInt()}m)",
+      body:
+          "$targetName bölgesinden uzaklaştınız. (Şu anki mesafe: ${distanceMeters.toInt()}m)",
       payload: 'GEOFENCE_EXIT',
       type: 'EXIT',
     );
@@ -172,7 +186,8 @@ class NotificationService {
     await showNotification(
       id: 999,
       title: "🛰️ Waypoint Sistem Bildirimi",
-      body: "Arka plan bildirim servisi ve geofence tetikleyicisi başarıyla çalışıyor.",
+      body:
+          "Arka plan bildirim servisi ve geofence tetikleyicisi başarıyla çalışıyor.",
       payload: 'TEST_NOTIFICATION',
       type: 'TEST',
     );

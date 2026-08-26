@@ -29,9 +29,12 @@ class HeatmapCluster {
     return records.map((r) => r.riskScore).reduce(max);
   }
 
-  int get safeCount => records.where((r) => !r.isBlocked && r.riskScore < 35).length;
-  int get suspiciousCount => records.where((r) => r.riskScore >= 35 && r.riskScore < 70).length;
-  int get blockedCount => records.where((r) => r.isBlocked || r.riskScore >= 70).length;
+  int get safeCount =>
+      records.where((r) => !r.isBlocked && r.riskScore < 35).length;
+  int get suspiciousCount =>
+      records.where((r) => r.riskScore >= 35 && r.riskScore < 70).length;
+  int get blockedCount =>
+      records.where((r) => r.isBlocked || r.riskScore >= 70).length;
 
   bool get hasHighRisk => blockedCount > 0 || highestRiskScore >= 70;
 

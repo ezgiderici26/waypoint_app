@@ -80,9 +80,11 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
             snippet: "Risk Skoru: $riskScore/100",
           ),
           icon: BitmapDescriptor.defaultMarkerWithHue(
-            riskScore < 35 
-                ? BitmapDescriptor.hueGreen 
-                : (riskScore < 70 ? BitmapDescriptor.hueOrange : BitmapDescriptor.hueRed),
+            riskScore < 35
+                ? BitmapDescriptor.hueGreen
+                : (riskScore < 70
+                      ? BitmapDescriptor.hueOrange
+                      : BitmapDescriptor.hueRed),
           ),
         ),
       );
@@ -101,7 +103,8 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
     };
 
     // Determine if check-in is allowed (Must be within geofence and risk score must be SAFE < 35)
-    final bool isInsideGeofence = distanceToTarget != null && distanceToTarget <= target.radius;
+    final bool isInsideGeofence =
+        distanceToTarget != null && distanceToTarget <= target.radius;
     final bool isSafe = riskScore < 35;
 
     return Scaffold(
@@ -158,13 +161,24 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline_rounded, size: 64, color: AppTheme.spoofed),
+                    const Icon(
+                      Icons.error_outline_rounded,
+                      size: 64,
+                      color: AppTheme.spoofed,
+                    ),
                     const SizedBox(height: 16),
-                    const Text("Bağlantı Hatası", style: TextStyle(fontWeight: FontWeight.bold)),
+                    const Text(
+                      "Bağlantı Hatası",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     const SizedBox(height: 8),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 32),
-                      child: Text(err.toString(), textAlign: TextAlign.center, style: const TextStyle(color: AppTheme.textSecondary)),
+                      child: Text(
+                        err.toString(),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: AppTheme.textSecondary),
+                      ),
                     ),
                   ],
                 ),
@@ -177,7 +191,7 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
               ),
             ),
           ),
-          
+
           // 2. Top Info Overlay (Risk Status Chip)
           Positioned(
             top: 16,
@@ -192,7 +206,10 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                   children: [
                     _buildRiskChip(riskScore),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: AppTheme.surface.withAlpha(204),
                         borderRadius: BorderRadius.circular(20),
@@ -200,7 +217,11 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.radar, color: AppTheme.primary, size: 16),
+                          const Icon(
+                            Icons.radar,
+                            color: AppTheme.primary,
+                            size: 16,
+                          ),
                           const SizedBox(width: 6),
                           Text(
                             "Mock GPS Koruması: AKTİF",
@@ -215,27 +236,42 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                     ),
                   ],
                 ),
-                
+
                 // Anomaly Warning Banners
                 if (riskState.isOsMocked) ...[
                   const SizedBox(height: 10),
-                  _buildWarningBanner("OS Mock Sağlayıcısı Algılandı! (K1)", Icons.gpp_bad_rounded),
+                  _buildWarningBanner(
+                    "OS Mock Sağlayıcısı Algılandı! (K1)",
+                    Icons.gpp_bad_rounded,
+                  ),
                 ],
                 if (riskState.isSpeedImpossible) ...[
                   const SizedBox(height: 10),
-                  _buildWarningBanner("İmkânsız Hız / Işınlanma Algılandı! (K4) (${riskState.computedSpeedKmh.toStringAsFixed(1)} km/s)", Icons.speed_rounded),
+                  _buildWarningBanner(
+                    "İmkânsız Hız / Işınlanma Algılandı! (K4) (${riskState.computedSpeedKmh.toStringAsFixed(1)} km/s)",
+                    Icons.speed_rounded,
+                  ),
                 ],
                 if (riskState.isDevModeActive) ...[
                   const SizedBox(height: 10),
-                  _buildWarningBanner("Geliştirici Modu / USB Hata Ayıklama Etkin! (K3)", Icons.developer_mode_rounded),
+                  _buildWarningBanner(
+                    "Geliştirici Modu / USB Hata Ayıklama Etkin! (K3)",
+                    Icons.developer_mode_rounded,
+                  ),
                 ],
                 if (riskState.isSensorInconsistent) ...[
                   const SizedBox(height: 10),
-                  _buildWarningBanner("Sensör ve Hız Tutarsızlığı Algılandı! (K5)", Icons.sensors_off_rounded),
+                  _buildWarningBanner(
+                    "Sensör ve Hız Tutarsızlığı Algılandı! (K5)",
+                    Icons.sensors_off_rounded,
+                  ),
                 ],
                 if (geofenceState.isInside) ...[
                   const SizedBox(height: 10),
-                  _buildGeofenceSuccessBanner("📍 Hedef Kontrol Alanı İçindesiniz (${target.name})", Icons.verified_rounded),
+                  _buildGeofenceSuccessBanner(
+                    "📍 Hedef Kontrol Alanı İçindesiniz (${target.name})",
+                    Icons.verified_rounded,
+                  ),
                 ],
               ],
             ),
@@ -270,15 +306,24 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                         data: (data) => Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            _buildCoordCol("Enlem", data.latitude.toStringAsFixed(6)),
-                            _buildCoordCol("Boylam", data.longitude.toStringAsFixed(6)),
                             _buildCoordCol(
-                              "Hız", 
+                              "Enlem",
+                              data.latitude.toStringAsFixed(6),
+                            ),
+                            _buildCoordCol(
+                              "Boylam",
+                              data.longitude.toStringAsFixed(6),
+                            ),
+                            _buildCoordCol(
+                              "Hız",
                               riskState.computedSpeedKmh > 0
                                   ? "${riskState.computedSpeedKmh.toStringAsFixed(1)} km/s"
                                   : "${(data.speed * 3.6).toStringAsFixed(1)} km/s",
                             ),
-                            _buildCoordCol("Doğruluk (Acc)", "${data.accuracy.toStringAsFixed(1)}m"),
+                            _buildCoordCol(
+                              "Doğruluk (Acc)",
+                              "${data.accuracy.toStringAsFixed(1)}m",
+                            ),
                           ],
                         ),
                         orElse: () => Row(
@@ -292,7 +337,7 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                         ),
                       ),
                       const Divider(color: Color(0xFF2A3547), height: 24),
-                      
+
                       // Geofencing Target Status
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -310,75 +355,101 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 const SizedBox(height: 2),
-                                _buildDistanceText(distanceToTarget, target.radius),
+                                _buildDistanceText(
+                                  distanceToTarget,
+                                  target.radius,
+                                ),
                               ],
                             ),
                           ),
                           const SizedBox(width: 8),
                           ElevatedButton(
-                            onPressed: isInsideGeofence ? () async {
-                              final biometricService = ref.read(biometricServiceProvider);
-                              
-                              // Check availability of biometric hardware first
-                              final bool available = await biometricService.isBiometricsAvailable();
-                              if (!available) {
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text("Biyometrik donanım bulunamadı veya etkinleştirilmedi!"),
-                                      backgroundColor: AppTheme.spoofed,
-                                    ),
-                                  );
-                                }
-                                return;
-                              }
+                            onPressed: isInsideGeofence
+                                ? () async {
+                                    final biometricService = ref.read(
+                                      biometricServiceProvider,
+                                    );
 
-                              // Trigger biometric scan prompt
-                              final bool success = await biometricService.authenticate();
-                              if (!success) {
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text("Biyometrik doğrulama reddedildi! İşlem iptal edildi."),
-                                      backgroundColor: AppTheme.spoofed,
-                                    ),
-                                  );
-                                }
-                                return;
-                              }
+                                    // Check availability of biometric hardware first
+                                    final bool available =
+                                        await biometricService
+                                            .isBiometricsAvailable();
+                                    if (!available) {
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              "Biyometrik donanım bulunamadı veya etkinleştirilmedi!",
+                                            ),
+                                            backgroundColor: AppTheme.spoofed,
+                                          ),
+                                        );
+                                      }
+                                      return;
+                                    }
 
-                              final currentLoc = locationAsync.value;
-                              final security = ref.read(securityProvider);
-                              final devStatus = "Rooted: ${security.isJailbroken}, Emulator: ${security.isEmulator}, VPN: ${security.isVpnActive}";
-                              
-                              if (currentLoc != null) {
-                                ref.read(checkInHistoryProvider.notifier).addCheckInRecord(
-                                  latitude: currentLoc.latitude,
-                                  longitude: currentLoc.longitude,
-                                  accuracy: currentLoc.accuracy,
-                                  riskScore: riskScore,
-                                  deviceStatus: devStatus,
-                                  targetName: target.name,
-                                  isBlocked: !isSafe,
-                                );
+                                    // Trigger biometric scan prompt
+                                    final bool success = await biometricService
+                                        .authenticate();
+                                    if (!success) {
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              "Biyometrik doğrulama reddedildi! İşlem iptal edildi.",
+                                            ),
+                                            backgroundColor: AppTheme.spoofed,
+                                          ),
+                                        );
+                                      }
+                                      return;
+                                    }
 
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        isSafe 
-                                            ? "Biyometrik doğrulama başarılı. Check-in eklendi!"
-                                            : "Güvenlik Engeli: Tehdit nedeniyle işlem engellendi!",
-                                      ),
-                                      backgroundColor: isSafe ? AppTheme.safe : AppTheme.spoofed,
-                                    ),
-                                  );
-                                }
-                              }
-                            } : null,
+                                    final currentLoc = locationAsync.value;
+                                    final security = ref.read(securityProvider);
+                                    final devStatus =
+                                        "Rooted: ${security.isJailbroken}, Emulator: ${security.isEmulator}, VPN: ${security.isVpnActive}";
+
+                                    if (currentLoc != null) {
+                                      ref
+                                          .read(checkInHistoryProvider.notifier)
+                                          .addCheckInRecord(
+                                            latitude: currentLoc.latitude,
+                                            longitude: currentLoc.longitude,
+                                            accuracy: currentLoc.accuracy,
+                                            riskScore: riskScore,
+                                            deviceStatus: devStatus,
+                                            targetName: target.name,
+                                            isBlocked: !isSafe,
+                                          );
+
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              isSafe
+                                                  ? "Biyometrik doğrulama başarılı. Check-in eklendi!"
+                                                  : "Güvenlik Engeli: Tehdit nedeniyle işlem engellendi!",
+                                            ),
+                                            backgroundColor: isSafe
+                                                ? AppTheme.safe
+                                                : AppTheme.spoofed,
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  }
+                                : null,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppTheme.primary,
-                              disabledBackgroundColor: AppTheme.textSecondary.withAlpha(51),
+                              disabledBackgroundColor: AppTheme.textSecondary
+                                  .withAlpha(51),
                             ),
                             child: const Text("Check-in Yap"),
                           ),
@@ -460,8 +531,8 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
 
     final bool isInside = distance <= radius;
     return Text(
-      isInside 
-          ? "Hedefe ${distance.toStringAsFixed(0)} m (Yarıçap içinde)" 
+      isInside
+          ? "Hedefe ${distance.toStringAsFixed(0)} m (Yarıçap içinde)"
           : "Hedefe ${distance.toStringAsFixed(0)} m uzaktasın",
       style: TextStyle(
         color: isInside ? AppTheme.safe : AppTheme.suspicious,

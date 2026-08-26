@@ -9,62 +9,65 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('HeatmapCluster Entity Tests', () {
-    test('Calculates count, average risk, safe and blocked counts accurately', () {
-      final records = [
-        CheckInRecord(
-          id: '1',
-          timestamp: DateTime.now().toIso8601String(),
-          latitude: 40.9905,
-          longitude: 29.0255,
-          accuracy: 4.0,
-          riskScore: 10,
-          deviceStatus: 'Normal',
-          targetName: 'Kadıköy',
-          isSynced: true,
-          isBlocked: false,
-        ),
-        CheckInRecord(
-          id: '2',
-          timestamp: DateTime.now().toIso8601String(),
+    test(
+      'Calculates count, average risk, safe and blocked counts accurately',
+      () {
+        final records = [
+          CheckInRecord(
+            id: '1',
+            timestamp: DateTime.now().toIso8601String(),
+            latitude: 40.9905,
+            longitude: 29.0255,
+            accuracy: 4.0,
+            riskScore: 10,
+            deviceStatus: 'Normal',
+            targetName: 'Kadıköy',
+            isSynced: true,
+            isBlocked: false,
+          ),
+          CheckInRecord(
+            id: '2',
+            timestamp: DateTime.now().toIso8601String(),
+            latitude: 40.9906,
+            longitude: 29.0256,
+            accuracy: 3.5,
+            riskScore: 30,
+            deviceStatus: 'Normal',
+            targetName: 'Kadıköy',
+            isSynced: true,
+            isBlocked: false,
+          ),
+          CheckInRecord(
+            id: '3',
+            timestamp: DateTime.now().toIso8601String(),
+            latitude: 40.9907,
+            longitude: 29.0254,
+            accuracy: 5.0,
+            riskScore: 80,
+            deviceStatus: 'Rooted: true',
+            targetName: 'Kadıköy',
+            isSynced: false,
+            isBlocked: true,
+          ),
+        ];
+
+        final cluster = HeatmapCluster(
+          id: 'cluster-kadikoy',
           latitude: 40.9906,
-          longitude: 29.0256,
-          accuracy: 3.5,
-          riskScore: 30,
-          deviceStatus: 'Normal',
-          targetName: 'Kadıköy',
-          isSynced: true,
-          isBlocked: false,
-        ),
-        CheckInRecord(
-          id: '3',
-          timestamp: DateTime.now().toIso8601String(),
-          latitude: 40.9907,
-          longitude: 29.0254,
-          accuracy: 5.0,
-          riskScore: 80,
-          deviceStatus: 'Rooted: true',
-          targetName: 'Kadıköy',
-          isSynced: false,
-          isBlocked: true,
-        ),
-      ];
+          longitude: 29.0255,
+          records: records,
+          primaryTargetName: 'Kadıköy',
+        );
 
-      final cluster = HeatmapCluster(
-        id: 'cluster-kadikoy',
-        latitude: 40.9906,
-        longitude: 29.0255,
-        records: records,
-        primaryTargetName: 'Kadıköy',
-      );
-
-      expect(cluster.count, equals(3));
-      expect(cluster.averageRiskScore, closeTo(40.0, 0.01));
-      expect(cluster.highestRiskScore, equals(80));
-      expect(cluster.safeCount, equals(2));
-      expect(cluster.blockedCount, equals(1));
-      expect(cluster.hasHighRisk, isTrue);
-      expect(cluster.densityLevel, equals(2.0));
-    });
+        expect(cluster.count, equals(3));
+        expect(cluster.averageRiskScore, closeTo(40.0, 0.01));
+        expect(cluster.highestRiskScore, equals(80));
+        expect(cluster.safeCount, equals(2));
+        expect(cluster.blockedCount, equals(1));
+        expect(cluster.hasHighRisk, isTrue);
+        expect(cluster.densityLevel, equals(2.0));
+      },
+    );
   });
 
   group('Heatmap Providers Logic & Filtering Tests', () {
@@ -99,7 +102,9 @@ void main() {
       // Taksim Threat Cluster (1 record, 85 risk, blocked)
       CheckInRecord(
         id: 'tks-1',
-        timestamp: now.subtract(const Duration(hours: 48)).toIso8601String(), // 2 days ago
+        timestamp: now
+            .subtract(const Duration(hours: 48))
+            .toIso8601String(), // 2 days ago
         latitude: 41.0370,
         longitude: 28.9850,
         accuracy: 4.0,
@@ -111,31 +116,42 @@ void main() {
       ),
     ];
 
-    test('Clustering groups geographically proximate records and separates distant ones', () {
-      final container = ProviderContainer(
-        overrides: [
-          checkInHistoryProvider.overrideWith((ref) => MockCheckInHistoryNotifier(sampleRecords)),
-        ],
-      );
+    test(
+      'Clustering groups geographically proximate records and separates distant ones',
+      () {
+        final container = ProviderContainer(
+          overrides: [
+            checkInHistoryProvider.overrideWith(
+              (ref) => MockCheckInHistoryNotifier(sampleRecords),
+            ),
+          ],
+        );
 
-      final clusters = container.read(heatmapClustersProvider);
-      expect(clusters.length, equals(2)); // Kadıköy and Taksim
+        final clusters = container.read(heatmapClustersProvider);
+        expect(clusters.length, equals(2)); // Kadıköy and Taksim
 
-      final kadikoyCluster = clusters.firstWhere((c) => c.primaryTargetName.contains('Kadıköy'));
-      expect(kadikoyCluster.count, equals(2));
-      expect(kadikoyCluster.safeCount, equals(2));
+        final kadikoyCluster = clusters.firstWhere(
+          (c) => c.primaryTargetName.contains('Kadıköy'),
+        );
+        expect(kadikoyCluster.count, equals(2));
+        expect(kadikoyCluster.safeCount, equals(2));
 
-      final taksimCluster = clusters.firstWhere((c) => c.primaryTargetName.contains('Taksim'));
-      expect(taksimCluster.count, equals(1));
-      expect(taksimCluster.hasHighRisk, isTrue);
+        final taksimCluster = clusters.firstWhere(
+          (c) => c.primaryTargetName.contains('Taksim'),
+        );
+        expect(taksimCluster.count, equals(1));
+        expect(taksimCluster.hasHighRisk, isTrue);
 
-      container.dispose();
-    });
+        container.dispose();
+      },
+    );
 
     test('Risk filtering returns only safe or only risky records', () {
       final container = ProviderContainer(
         overrides: [
-          checkInHistoryProvider.overrideWith((ref) => MockCheckInHistoryNotifier(sampleRecords)),
+          checkInHistoryProvider.overrideWith(
+            (ref) => MockCheckInHistoryNotifier(sampleRecords),
+          ),
         ],
       );
 
@@ -159,7 +175,9 @@ void main() {
     test('Time filtering filters out older records', () {
       final container = ProviderContainer(
         overrides: [
-          checkInHistoryProvider.overrideWith((ref) => MockCheckInHistoryNotifier(sampleRecords)),
+          checkInHistoryProvider.overrideWith(
+            (ref) => MockCheckInHistoryNotifier(sampleRecords),
+          ),
         ],
       );
 
@@ -177,7 +195,9 @@ void main() {
     test('Heatmap stats computes correct KPI summary values', () {
       final container = ProviderContainer(
         overrides: [
-          checkInHistoryProvider.overrideWith((ref) => MockCheckInHistoryNotifier(sampleRecords)),
+          checkInHistoryProvider.overrideWith(
+            (ref) => MockCheckInHistoryNotifier(sampleRecords),
+          ),
         ],
       );
 
@@ -194,31 +214,37 @@ void main() {
       container.dispose();
     });
 
-    test('Google Maps circles provider produces multi-layer gradient circles in density & risk modes', () {
-      final container = ProviderContainer(
-        overrides: [
-          checkInHistoryProvider.overrideWith((ref) => MockCheckInHistoryNotifier(sampleRecords)),
-        ],
-      );
+    test(
+      'Google Maps circles provider produces multi-layer gradient circles in density & risk modes',
+      () {
+        final container = ProviderContainer(
+          overrides: [
+            checkInHistoryProvider.overrideWith(
+              (ref) => MockCheckInHistoryNotifier(sampleRecords),
+            ),
+          ],
+        );
 
-      final notifier = container.read(heatmapNotifierProvider.notifier);
+        final notifier = container.read(heatmapNotifierProvider.notifier);
 
-      // Density mode circles (4 concentric layers per cluster -> 2 clusters = 8 circles)
-      notifier.setMode(HeatmapMode.density);
-      var circles = container.read(heatmapCirclesProvider);
-      expect(circles.length, equals(8));
+        // Density mode circles (4 concentric layers per cluster -> 2 clusters = 8 circles)
+        notifier.setMode(HeatmapMode.density);
+        var circles = container.read(heatmapCirclesProvider);
+        expect(circles.length, equals(8));
 
-      // Risk mode circles (3 concentric layers per cluster -> 2 clusters = 6 circles)
-      notifier.setMode(HeatmapMode.risk);
-      circles = container.read(heatmapCirclesProvider);
-      expect(circles.length, equals(6));
+        // Risk mode circles (3 concentric layers per cluster -> 2 clusters = 6 circles)
+        notifier.setMode(HeatmapMode.risk);
+        circles = container.read(heatmapCirclesProvider);
+        expect(circles.length, equals(6));
 
-      container.dispose();
-    });
+        container.dispose();
+      },
+    );
   });
 }
 
-class MockCheckInHistoryNotifier extends StateNotifier<List<CheckInRecord>> implements CheckInHistoryNotifier {
+class MockCheckInHistoryNotifier extends StateNotifier<List<CheckInRecord>>
+    implements CheckInHistoryNotifier {
   MockCheckInHistoryNotifier(super.initialState);
 
   @override

@@ -6,10 +6,7 @@ import '../../domain/entities/heatmap_cluster.dart';
 class HeatmapPointDetailDialog extends ConsumerWidget {
   final HeatmapCluster cluster;
 
-  const HeatmapPointDetailDialog({
-    super.key,
-    required this.cluster,
-  });
+  const HeatmapPointDetailDialog({super.key, required this.cluster});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -23,9 +20,7 @@ class HeatmapPointDetailDialog extends ConsumerWidget {
       decoration: const BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        border: Border(
-          top: BorderSide(color: Color(0xFF2A3547), width: 1.5),
-        ),
+        border: Border(top: BorderSide(color: Color(0xFF2A3547), width: 1.5)),
       ),
       child: SafeArea(
         top: false,
@@ -66,15 +61,22 @@ class HeatmapPointDetailDialog extends ConsumerWidget {
                       const SizedBox(height: 4),
                       Text(
                         "${cluster.latitude.toStringAsFixed(4)}, ${cluster.longitude.toStringAsFixed(4)}",
-                        style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.textSecondary,
+                        ),
                       ),
                     ],
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
-                    color: (hasRisk ? AppTheme.spoofed : AppTheme.safe).withAlpha(35),
+                    color: (hasRisk ? AppTheme.spoofed : AppTheme.safe)
+                        .withAlpha(35),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                       color: hasRisk ? AppTheme.spoofed : AppTheme.safe,
@@ -84,7 +86,9 @@ class HeatmapPointDetailDialog extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        hasRisk ? Icons.warning_amber_rounded : Icons.check_circle_rounded,
+                        hasRisk
+                            ? Icons.warning_amber_rounded
+                            : Icons.check_circle_rounded,
                         color: hasRisk ? AppTheme.spoofed : AppTheme.safe,
                         size: 16,
                       ),
@@ -109,10 +113,16 @@ class HeatmapPointDetailDialog extends ConsumerWidget {
               children: [
                 _buildCountBadge("Toplam: ${cluster.count}", AppTheme.primary),
                 const SizedBox(width: 8),
-                _buildCountBadge("Güvenli: ${cluster.safeCount}", AppTheme.safe),
+                _buildCountBadge(
+                  "Güvenli: ${cluster.safeCount}",
+                  AppTheme.safe,
+                ),
                 const SizedBox(width: 8),
                 if (cluster.blockedCount > 0)
-                  _buildCountBadge("Engellenen: ${cluster.blockedCount}", AppTheme.spoofed),
+                  _buildCountBadge(
+                    "Engellenen: ${cluster.blockedCount}",
+                    AppTheme.spoofed,
+                  ),
               ],
             ),
             const Divider(height: 24, color: Color(0xFF2A3547)),
@@ -137,14 +147,16 @@ class HeatmapPointDetailDialog extends ConsumerWidget {
                 itemBuilder: (context, index) {
                   final rec = cluster.records[index];
                   final bool isRisky = rec.isBlocked || rec.riskScore >= 35;
-                  
+
                   return Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: AppTheme.cardBg,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isRisky ? AppTheme.spoofed.withAlpha(100) : const Color(0xFF2A3547),
+                        color: isRisky
+                            ? AppTheme.spoofed.withAlpha(100)
+                            : const Color(0xFF2A3547),
                       ),
                     ),
                     child: Column(
@@ -156,17 +168,25 @@ class HeatmapPointDetailDialog extends ConsumerWidget {
                             Row(
                               children: [
                                 Icon(
-                                  rec.isBlocked ? Icons.block_rounded : Icons.check_circle_outline_rounded,
+                                  rec.isBlocked
+                                      ? Icons.block_rounded
+                                      : Icons.check_circle_outline_rounded,
                                   size: 16,
-                                  color: rec.isBlocked ? AppTheme.spoofed : AppTheme.safe,
+                                  color: rec.isBlocked
+                                      ? AppTheme.spoofed
+                                      : AppTheme.safe,
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
-                                  rec.isBlocked ? "Engellendi" : "Başarılı Check-in",
+                                  rec.isBlocked
+                                      ? "Engellendi"
+                                      : "Başarılı Check-in",
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.bold,
-                                    color: rec.isBlocked ? AppTheme.spoofed : AppTheme.safe,
+                                    color: rec.isBlocked
+                                        ? AppTheme.spoofed
+                                        : AppTheme.safe,
                                   ),
                                 ),
                               ],
@@ -176,9 +196,11 @@ class HeatmapPointDetailDialog extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: rec.riskScore < 35 
-                                    ? AppTheme.safe 
-                                    : (rec.riskScore < 70 ? AppTheme.suspicious : AppTheme.spoofed),
+                                color: rec.riskScore < 35
+                                    ? AppTheme.safe
+                                    : (rec.riskScore < 70
+                                          ? AppTheme.suspicious
+                                          : AppTheme.spoofed),
                               ),
                             ),
                           ],
@@ -186,7 +208,10 @@ class HeatmapPointDetailDialog extends ConsumerWidget {
                         const SizedBox(height: 6),
                         Text(
                           "Cihaz: ${rec.deviceStatus}",
-                          style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppTheme.textSecondary,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Row(
@@ -194,13 +219,20 @@ class HeatmapPointDetailDialog extends ConsumerWidget {
                           children: [
                             Text(
                               "Tarih: ${rec.timestamp.split('T').first} ${rec.timestamp.contains('T') ? rec.timestamp.split('T')[1].substring(0, 5) : ''}",
-                              style: const TextStyle(fontSize: 10, color: Color(0xFF64748B)),
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: Color(0xFF64748B),
+                              ),
                             ),
                             Text(
-                              rec.isSynced ? "Sunucuya Eşitlendi ✓" : "Kuyrukta (Offline) ⏳",
+                              rec.isSynced
+                                  ? "Sunucuya Eşitlendi ✓"
+                                  : "Kuyrukta (Offline) ⏳",
                               style: TextStyle(
                                 fontSize: 10,
-                                color: rec.isSynced ? AppTheme.safe : AppTheme.suspicious,
+                                color: rec.isSynced
+                                    ? AppTheme.safe
+                                    : AppTheme.suspicious,
                               ),
                             ),
                           ],
@@ -227,7 +259,11 @@ class HeatmapPointDetailDialog extends ConsumerWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: color),
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
       ),
     );
   }

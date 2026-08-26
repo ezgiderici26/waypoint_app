@@ -5,10 +5,7 @@ import '../providers/heatmap_providers.dart';
 class HeatmapLegend extends StatelessWidget {
   final HeatmapMode mode;
 
-  const HeatmapLegend({
-    super.key,
-    required this.mode,
-  });
+  const HeatmapLegend({super.key, required this.mode});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +28,9 @@ class HeatmapLegend extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            mode == HeatmapMode.density ? "YOĞUNLUK SKALASI" : (mode == HeatmapMode.risk ? "GÜVENLİK RİSKİ" : "NOKTASAL"),
+            mode == HeatmapMode.density
+                ? "YOĞUNLUK SKALASI"
+                : (mode == HeatmapMode.risk ? "GÜVENLİK RİSKİ" : "NOKTASAL"),
             style: const TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w900,
@@ -87,12 +86,7 @@ class HeatmapLegend extends StatelessWidget {
           decoration: BoxDecoration(
             color: color,
             shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: color.withAlpha(180),
-                blurRadius: 4,
-              ),
-            ],
+            boxShadow: [BoxShadow(color: color.withAlpha(180), blurRadius: 4)],
           ),
         ),
         const SizedBox(width: 4),

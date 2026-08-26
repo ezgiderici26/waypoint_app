@@ -12,10 +12,10 @@ class LocationRepositoryImpl implements LocationRepository {
       accuracy: LocationAccuracy.high,
       distanceFilter: 1, // Get updates every meter
     );
-    
-    return Geolocator.getPositionStream(locationSettings: locationSettings).map(
-      (Position position) => _mapPositionToLocationData(position),
-    );
+
+    return Geolocator.getPositionStream(
+      locationSettings: locationSettings,
+    ).map((Position position) => _mapPositionToLocationData(position));
   }
 
   @override
@@ -27,16 +27,24 @@ class LocationRepositoryImpl implements LocationRepository {
   }
 
   @override
-  double calculateDistance(double startLat, double startLng, double endLat, double endLng) {
+  double calculateDistance(
+    double startLat,
+    double startLng,
+    double endLat,
+    double endLng,
+  ) {
     // Haversine distance formula implementation
     const double r = 6371000; // Earth radius in meters
     final double dLat = _toRadians(endLat - startLat);
     final double dLng = _toRadians(endLng - startLng);
-    
-    final double a = sin(dLat / 2) * sin(dLat / 2) +
-        cos(_toRadians(startLat)) * cos(_toRadians(endLat)) * 
-        sin(dLng / 2) * sin(dLng / 2);
-        
+
+    final double a =
+        sin(dLat / 2) * sin(dLat / 2) +
+        cos(_toRadians(startLat)) *
+            cos(_toRadians(endLat)) *
+            sin(dLng / 2) *
+            sin(dLng / 2);
+
     final double c = 2 * atan2(sqrt(a), sqrt(1 - a));
     return r * c;
   }

@@ -11,7 +11,7 @@ void main() {
   group('Antispoofing and Risk Scoring Logic Tests', () {
     test('K1 OS Mock Detection & K4 Speed Anomaly Tests', () async {
       final controller = StreamController<LocationData>();
-      
+
       final container = ProviderContainer(
         overrides: [
           // Override the location stream with our custom test stream
@@ -27,30 +27,34 @@ void main() {
 
       // 2. Emit normal location
       final now = DateTime.now();
-      controller.add(LocationData(
-        latitude: 41.0082,
-        longitude: 28.9784,
-        speed: 10.0,
-        accuracy: 3.0,
-        bearing: 0.0,
-        timestamp: now,
-        isMocked: false,
-      ));
+      controller.add(
+        LocationData(
+          latitude: 41.0082,
+          longitude: 28.9784,
+          speed: 10.0,
+          accuracy: 3.0,
+          bearing: 0.0,
+          timestamp: now,
+          isMocked: false,
+        ),
+      );
       await Future.delayed(const Duration(milliseconds: 10));
 
       expect(container.read(antispoofingProvider).riskScore, equals(0));
       expect(container.read(antispoofingProvider).isOsMocked, isFalse);
 
       // 3. Emit OS Mocked location (K1)
-      controller.add(LocationData(
-        latitude: 41.0082,
-        longitude: 28.9784,
-        speed: 10.0,
-        accuracy: 3.0,
-        bearing: 0.0,
-        timestamp: now.add(const Duration(seconds: 2)),
-        isMocked: true, // K1 Triggered!
-      ));
+      controller.add(
+        LocationData(
+          latitude: 41.0082,
+          longitude: 28.9784,
+          speed: 10.0,
+          accuracy: 3.0,
+          bearing: 0.0,
+          timestamp: now.add(const Duration(seconds: 2)),
+          isMocked: true, // K1 Triggered!
+        ),
+      );
       await Future.delayed(const Duration(milliseconds: 10));
 
       // K1 adds 75 points in our new weighted model
@@ -67,26 +71,30 @@ void main() {
       );
       container2.listen(antispoofingProvider, (prev, next) {});
 
-      controller2.add(LocationData(
-        latitude: 41.0082,
-        longitude: 28.9784,
-        speed: 10.0,
-        accuracy: 3.0,
-        bearing: 0.0,
-        timestamp: now,
-        isMocked: false,
-      ));
+      controller2.add(
+        LocationData(
+          latitude: 41.0082,
+          longitude: 28.9784,
+          speed: 10.0,
+          accuracy: 3.0,
+          bearing: 0.0,
+          timestamp: now,
+          isMocked: false,
+        ),
+      );
       await Future.delayed(const Duration(milliseconds: 10));
 
-      controller2.add(LocationData(
-        latitude: 39.9334,
-        longitude: 32.8597,
-        speed: 10.0,
-        accuracy: 3.0,
-        bearing: 0.0,
-        timestamp: now.add(const Duration(seconds: 2)),
-        isMocked: false,
-      ));
+      controller2.add(
+        LocationData(
+          latitude: 39.9334,
+          longitude: 32.8597,
+          speed: 10.0,
+          accuracy: 3.0,
+          bearing: 0.0,
+          timestamp: now.add(const Duration(seconds: 2)),
+          isMocked: false,
+        ),
+      );
       await Future.delayed(const Duration(milliseconds: 10));
 
       expect(container2.read(antispoofingProvider).isSpeedImpossible, isTrue);

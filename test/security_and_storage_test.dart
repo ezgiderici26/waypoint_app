@@ -9,8 +9,9 @@ import 'package:waypoint_app/features/check_in/domain/entities/check_in_record.d
 void main() {
   group('EncryptionHelper Unit Tests', () {
     test('AES-256 Encrypt and Decrypt integrity test', () {
-      const originalPayload = '{"id":"test-123","riskScore":25,"targetName":"Test HQ"}';
-      
+      const originalPayload =
+          '{"id":"test-123","riskScore":25,"targetName":"Test HQ"}';
+
       final encrypted = EncryptionHelper.encrypt(originalPayload);
       expect(encrypted, isNot(equals(originalPayload)));
       expect(encrypted.isNotEmpty, isTrue);
@@ -46,35 +47,41 @@ void main() {
   });
 
   group('BiometricService Simulation Tests', () {
-    test('BiometricService simulates failure when simulation flag is active', () async {
-      final container = ProviderContainer();
-      final simNotifier = container.read(simulationProvider.notifier);
-      final biometricService = container.read(biometricServiceProvider);
+    test(
+      'BiometricService simulates failure when simulation flag is active',
+      () async {
+        final container = ProviderContainer();
+        final simNotifier = container.read(simulationProvider.notifier);
+        final biometricService = container.read(biometricServiceProvider);
 
-      // Trigger biometric fail simulation
-      simNotifier.toggleBiometricFail(true);
-      final result = await biometricService.authenticate();
-      expect(result, isFalse);
+        // Trigger biometric fail simulation
+        simNotifier.toggleBiometricFail(true);
+        final result = await biometricService.authenticate();
+        expect(result, isFalse);
 
-      container.dispose();
-    });
+        container.dispose();
+      },
+    );
 
-    test('BiometricService simulates success when emulator simulation is active', () async {
-      final container = ProviderContainer();
-      final simNotifier = container.read(simulationProvider.notifier);
-      final biometricService = container.read(biometricServiceProvider);
+    test(
+      'BiometricService simulates success when emulator simulation is active',
+      () async {
+        final container = ProviderContainer();
+        final simNotifier = container.read(simulationProvider.notifier);
+        final biometricService = container.read(biometricServiceProvider);
 
-      // Disable biometric fail, enable emulator simulation
-      simNotifier.toggleBiometricFail(false);
-      simNotifier.toggleEmulator(true);
+        // Disable biometric fail, enable emulator simulation
+        simNotifier.toggleBiometricFail(false);
+        simNotifier.toggleEmulator(true);
 
-      final isAvailable = await biometricService.isBiometricsAvailable();
-      expect(isAvailable, isTrue);
+        final isAvailable = await biometricService.isBiometricsAvailable();
+        expect(isAvailable, isTrue);
 
-      final result = await biometricService.authenticate();
-      expect(result, isTrue);
+        final result = await biometricService.authenticate();
+        expect(result, isTrue);
 
-      container.dispose();
-    });
+        container.dispose();
+      },
+    );
   });
 }

@@ -56,13 +56,16 @@ class SimulationConfig {
       simulateMockLocation: simulateMockLocation ?? this.simulateMockLocation,
       simulateDevMode: simulateDevMode ?? this.simulateDevMode,
       simulateSpeedAnomaly: simulateSpeedAnomaly ?? this.simulateSpeedAnomaly,
-      simulateSensorInconsistency: simulateSensorInconsistency ?? this.simulateSensorInconsistency,
+      simulateSensorInconsistency:
+          simulateSensorInconsistency ?? this.simulateSensorInconsistency,
       simulateRooted: simulateRooted ?? this.simulateRooted,
       simulateEmulator: simulateEmulator ?? this.simulateEmulator,
       simulateVpn: simulateVpn ?? this.simulateVpn,
       simulateApiOffline: simulateApiOffline ?? this.simulateApiOffline,
-      simulatePlayIntegrityFail: simulatePlayIntegrityFail ?? this.simulatePlayIntegrityFail,
-      simulateBiometricFail: simulateBiometricFail ?? this.simulateBiometricFail,
+      simulatePlayIntegrityFail:
+          simulatePlayIntegrityFail ?? this.simulatePlayIntegrityFail,
+      simulateBiometricFail:
+          simulateBiometricFail ?? this.simulateBiometricFail,
     );
   }
 }
@@ -70,18 +73,26 @@ class SimulationConfig {
 class SimulationNotifier extends StateNotifier<SimulationConfig> {
   SimulationNotifier() : super(SimulationConfig.initial());
 
-  void toggleMockLocation(bool val) => state = state.copyWith(simulateMockLocation: val);
+  void toggleMockLocation(bool val) =>
+      state = state.copyWith(simulateMockLocation: val);
   void toggleDevMode(bool val) => state = state.copyWith(simulateDevMode: val);
-  void toggleSpeedAnomaly(bool val) => state = state.copyWith(simulateSpeedAnomaly: val);
-  void toggleSensorInconsistency(bool val) => state = state.copyWith(simulateSensorInconsistency: val);
+  void toggleSpeedAnomaly(bool val) =>
+      state = state.copyWith(simulateSpeedAnomaly: val);
+  void toggleSensorInconsistency(bool val) =>
+      state = state.copyWith(simulateSensorInconsistency: val);
   void toggleRooted(bool val) => state = state.copyWith(simulateRooted: val);
-  void toggleEmulator(bool val) => state = state.copyWith(simulateEmulator: val);
+  void toggleEmulator(bool val) =>
+      state = state.copyWith(simulateEmulator: val);
   void toggleVpn(bool val) => state = state.copyWith(simulateVpn: val);
-  void toggleApiOffline(bool val) => state = state.copyWith(simulateApiOffline: val);
-  void togglePlayIntegrityFail(bool val) => state = state.copyWith(simulatePlayIntegrityFail: val);
-  void toggleBiometricFail(bool val) => state = state.copyWith(simulateBiometricFail: val);
+  void toggleApiOffline(bool val) =>
+      state = state.copyWith(simulateApiOffline: val);
+  void togglePlayIntegrityFail(bool val) =>
+      state = state.copyWith(simulatePlayIntegrityFail: val);
+  void toggleBiometricFail(bool val) =>
+      state = state.copyWith(simulateBiometricFail: val);
 }
 
-final simulationProvider = StateNotifierProvider<SimulationNotifier, SimulationConfig>((ref) {
-  return SimulationNotifier();
-});
+final simulationProvider =
+    StateNotifierProvider<SimulationNotifier, SimulationConfig>((ref) {
+      return SimulationNotifier();
+    });

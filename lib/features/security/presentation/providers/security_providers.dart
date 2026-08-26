@@ -12,7 +12,7 @@ class SecurityState {
   final bool isVpnActive;
   final bool isChecking;
   final String riskLabel;
-  
+
   // Play Integrity & App Attest Attestation
   final bool isIntegrityVerified;
   final String integrityVerdict;
@@ -71,7 +71,10 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
   SecurityNotifier(this._ref) : super(SecurityState.initial()) {
     checkIntegrity();
     // Run periodically to monitor changes (e.g. turning VPN on/off)
-    _timer = Timer.periodic(const Duration(seconds: 10), (_) => checkIntegrity());
+    _timer = Timer.periodic(
+      const Duration(seconds: 10),
+      (_) => checkIntegrity(),
+    );
 
     // Trigger immediate recheck when simulation changes
     _ref.listen<SimulationConfig>(simulationProvider, (_, __) {
@@ -86,7 +89,8 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
       final bool finalJailbroken = sim.simulateRooted;
       final bool finalEmulator = sim.simulateEmulator;
       final bool finalPlayIntegrityFail = sim.simulatePlayIntegrityFail;
-      final bool integrityVerified = !finalPlayIntegrityFail && !finalEmulator && !finalJailbroken;
+      final bool integrityVerified =
+          !finalPlayIntegrityFail && !finalEmulator && !finalJailbroken;
 
       state = SecurityState(
         isJailbroken: finalJailbroken,
@@ -96,7 +100,9 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
         isChecking: false,
         riskLabel: finalJailbroken ? "TEHLİKELİ (Root/Jailbreak)" : "GÜVENLİ",
         isIntegrityVerified: integrityVerified,
-        integrityVerdict: integrityVerified ? "MEETS_STRONG_INTEGRITY" : "INTEGRITY_FAILED",
+        integrityVerdict: integrityVerified
+            ? "MEETS_STRONG_INTEGRITY"
+            : "INTEGRITY_FAILED",
       );
       return;
     }
@@ -134,10 +140,10 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
         vpnActive = interfaces.any((interface) {
           final name = interface.name.toLowerCase();
           return name.contains('tun') ||
-                 name.contains('ppp') ||
-                 name.contains('p2p') ||
-                 name.contains('tap') ||
-                 name.contains('vpn');
+              name.contains('ppp') ||
+              name.contains('p2p') ||
+              name.contains('tap') ||
+              name.contains('vpn');
         });
       } catch (_) {}
 
@@ -150,12 +156,15 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
 
       // 4. Play Integrity / App Attest cryptographic attestation logic
       // In physical devices, bootloader locks and CTS profiles are required to pass.
-      final bool integrityVerified = !finalPlayIntegrityFail && !finalEmulator && !finalJailbroken;
-      final String integrityVerdict = integrityVerified 
-          ? (Platform.isAndroid ? "MEETS_STRONG_INTEGRITY (Verified)" : "APP_ATTEST_VERIFIED (Verified)") 
-          : (finalPlayIntegrityFail 
-              ? "INTEGRITY_FAILED (SIGNATURE_MISMATCH)" 
-              : "MEETS_NO_INTEGRITY (EMULATOR / ROOTED)");
+      final bool integrityVerified =
+          !finalPlayIntegrityFail && !finalEmulator && !finalJailbroken;
+      final String integrityVerdict = integrityVerified
+          ? (Platform.isAndroid
+                ? "MEETS_STRONG_INTEGRITY (Verified)"
+                : "APP_ATTEST_VERIFIED (Verified)")
+          : (finalPlayIntegrityFail
+                ? "INTEGRITY_FAILED (SIGNATURE_MISMATCH)"
+                : "MEETS_NO_INTEGRITY (EMULATOR / ROOTED)");
 
       // Calculate Label
       String label = "GÜVENLİ";
@@ -177,7 +186,7 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
       );
     } catch (_) {
       state = state.copyWith(
-        isChecking: false, 
+        isChecking: false,
         riskLabel: "Hata Oluştu",
         isIntegrityVerified: false,
         integrityVerdict: "HATA_OLUSTU",
@@ -192,6 +201,8 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
   }
 }
 
-final securityProvider = StateNotifierProvider<SecurityNotifier, SecurityState>((ref) {
-  return SecurityNotifier(ref);
-});
+final securityProvider = StateNotifierProvider<SecurityNotifier, SecurityState>(
+  (ref) {
+    return SecurityNotifier(ref);
+  },
+);

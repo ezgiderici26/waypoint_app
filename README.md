@@ -1,5 +1,7 @@
 # Waypoint Safe Check-in Application 🛰️🛡️
 
+[![Waypoint CI/CD Pipeline](https://github.com/ezgiderici26/waypoint_app/actions/workflows/ci_cd.yml/badge.svg)](https://github.com/ezgiderici26/waypoint_app/actions/workflows/ci_cd.yml)
+
 Waypoint, modern mobil güvenlik tehditlerine karşı geliştirilmiş, Clean Architecture prensiplerine uygun, Riverpod durum yönetimli, Google Maps entegrasyonlu ve gelişmiş konum doğrulama (antispoofing) yeteneklerine sahip bir Flutter mobil uygulamasıdır.
 
 Uygulamanın ana amacı; kullanıcıların belirli kontrol noktalarında (geofence) güvenli ve konum manipülasyonu (Fake GPS, Root, VPN, Emulator) yapılmamış bir şekilde "Check-in" işlemini gerçekleştirmesini sağlamaktır.
@@ -47,6 +49,13 @@ Algılanan anomaliler normalize edilerek 0 ile 100 arasında bir risk skoru üre
     *   🚪 **Çıkış Bildirimi:** *"Hedef Alandan Çıktınız (Kadıköy Meydan bölgesinden uzaklaştınız. Mesafe: 380m)"*
 *   **Olay Günlüğü:** Ayarlar menüsünden tüm giriş/çıkış olaylarının saat, mesafe ve hedef bilgileri listelenir.
 *   **Android & iOS İzinleri:** Android 13+ `POST_NOTIFICATIONS`, `ACCESS_BACKGROUND_LOCATION` ve `FOREGROUND_SERVICE_LOCATION` izinleriyle tam uyumluluk.
+
+### 7. ⚙️ Otomatik CI/CD Pipeline (GitHub Actions)
+*   `.github/workflows/ci_cd.yml` dosyası ile tam otomatik 3 aşamalı DevOps boru hattı kurulmuştur:
+    1.  **🔍 Lint & Format & Statik Analiz:** Dart formatting (`dart format`) ve `flutter analyze` linter kontrolleri.
+    2.  **🧪 Otomatik Test & Coverage:** 15 testten oluşan birim/widget testlerinin icrası ve `lcov.info` test kapsama raporunun artifact olarak yüklenmesi.
+    3.  **📱 Android Build & Artifact:** Debug ve Release APK (`app-release.apk`) derlenip 14 gün saklanmak üzere GitHub Actions Artifacts bölümüne otomatik yüklenmesi.
+*   `push` (kod gönderimi) ve `pull_request` açıldığında otomatik tetiklenir; ayrıca GitHub UI üzerinden `workflow_dispatch` ile manuel de çalıştırılabilir.
 
 ---
 
@@ -102,4 +111,16 @@ Uygulamayı emülatörde veya cihazda test ederken Fake GPS açmaya gerek kalmad
 4.  Ardından **"Alandan Çıkış Simüle Et"** butonuna basın:
     *   Cihazınıza *"🚪 Hedef Alandan Çıktınız (Mesafe: 380m)"* push bildirimi düşecektir.
 5.  Ayarlar sekmesindeki **"Geofence Olay Geçmişi"** butonuna basarak gerçekleşen tüm giriş/çıkış olaylarının saat, mesafe ve hedef kayıtlarını detaylı listede görüntüleyin.
+
+### 5. ⚙️ GitHub Actions CI/CD Pipeline Manuel Test ve Çalıştırma Adımları
+1.  Değişiklikleri GitHub reponuza push edin:
+    ```powershell
+    git push origin main
+    ```
+2.  Tarayıcınızda GitHub reponuzu açıp **Actions** sekmesine tıklayın.
+3.  **"Waypoint CI/CD Pipeline 🛰️🛡️"** iş akışının otomatik olarak başladığını görün:
+    *   🟢 **Lint, Format & Static Analysis:** Kod formatı ve `flutter analyze` adımı tamamlanır.
+    *   🟢 **Automated Test Suite & Coverage:** 15 testin tamamı Linux üzerinde koşar ve test kapsama raporu üretilir.
+    *   🟢 **Build Android APK & Artifact:** Release ve Debug APK dosyaları derlenir ve sayfanın en altındaki **Artifacts** bölümünden doğrudan indirilebilir hale gelir.
+4.  Dilerseniz Actions sekmesinde iş akışını seçip **"Run workflow"** butonuna basarak dilediğiniz zaman manuel tetikleme de yapabilirsiniz.
 
