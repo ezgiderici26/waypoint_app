@@ -7,39 +7,54 @@ import 'package:flutter_jailbreak_detection/flutter_jailbreak_detection.dart';
 import '../providers/location_providers.dart';
 import '../../domain/entities/location_data.dart';
 import '../../../../core/providers/simulation_provider.dart';
+import '../../../settings/domain/entities/risk_tuning_config.dart';
+import '../../../settings/presentation/providers/risk_tuning_providers.dart';
+import '../../../security/presentation/providers/security_providers.dart';
 
 class RiskState {
   final LocationData? currentLocation;
   final LocationData? previousLocation;
   final double computedSpeedKmh;
 
-  // Antispoofing Check Flags
+  // Antispoofing Check Flags (K1 - K7)
   final bool isOsMocked; // K1
+  final bool isMockApp; // K2
   final bool isDevModeActive; // K3
   final bool isSpeedImpossible; // K4
   final bool isSensorInconsistent; // K5
+  final bool isCompromised; // K6 (Root / Emulator)
+  final bool isVpnActive; // K7 (VPN / Proxy)
 
   final int riskScore; // 0-100 normalized score
+  final RiskCategory riskCategory;
 
   const RiskState({
     this.currentLocation,
     this.previousLocation,
     required this.computedSpeedKmh,
     required this.isOsMocked,
+    this.isMockApp = false,
     required this.isDevModeActive,
     required this.isSpeedImpossible,
     required this.isSensorInconsistent,
+    this.isCompromised = false,
+    this.isVpnActive = false,
     required this.riskScore,
+    this.riskCategory = RiskCategory.safe,
   });
 
   factory RiskState.initial() {
     return const RiskState(
       computedSpeedKmh: 0,
       isOsMocked: false,
+      isMockApp: false,
       isDevModeActive: false,
       isSpeedImpossible: false,
       isSensorInconsistent: false,
+      isCompromised: false,
+      isVpnActive: false,
       riskScore: 0,
+      riskCategory: RiskCategory.safe,
     );
   }
 
@@ -48,20 +63,28 @@ class RiskState {
     LocationData? previousLocation,
     double? computedSpeedKmh,
     bool? isOsMocked,
+    bool? isMockApp,
     bool? isDevModeActive,
     bool? isSpeedImpossible,
     bool? isSensorInconsistent,
+    bool? isCompromised,
+    bool? isVpnActive,
     int? riskScore,
+    RiskCategory? riskCategory,
   }) {
     return RiskState(
       currentLocation: currentLocation ?? this.currentLocation,
       previousLocation: previousLocation ?? this.previousLocation,
       computedSpeedKmh: computedSpeedKmh ?? this.computedSpeedKmh,
       isOsMocked: isOsMocked ?? this.isOsMocked,
+      isMockApp: isMockApp ?? this.isMockApp,
       isDevModeActive: isDevModeActive ?? this.isDevModeActive,
       isSpeedImpossible: isSpeedImpossible ?? this.isSpeedImpossible,
       isSensorInconsistent: isSensorInconsistent ?? this.isSensorInconsistent,
+      isCompromised: isCompromised ?? this.isCompromised,
+      isVpnActive: isVpnActive ?? this.isVpnActive,
       riskScore: riskScore ?? this.riskScore,
+      riskCategory: riskCategory ?? this.riskCategory,
     );
   }
 }
@@ -92,6 +115,20 @@ class AntispoofingNotifier extends StateNotifier<RiskState> {
 
     // Re-evaluate when simulation configuration changes
     _ref.listen<SimulationConfig>(simulationProvider, (_, __) {
+      if (state.currentLocation != null) {
+        _evaluateLocation(state.currentLocation!);
+      }
+    });
+
+    // Re-evaluate when dynamic risk tuning coefficients change
+    _ref.listen<RiskTuningConfig>(riskTuningProvider, (_, __) {
+      if (state.currentLocation != null) {
+        _evaluateLocation(state.currentLocation!);
+      }
+    });
+
+    // Re-evaluate when device security state changes (VPN, Root)
+    _ref.listen<SecurityState>(securityProvider, (_, __) {
       if (state.currentLocation != null) {
         _evaluateLocation(state.currentLocation!);
       }
@@ -133,8 +170,10 @@ class AntispoofingNotifier extends StateNotifier<RiskState> {
     bool sensorInconsistent = false;
     double computedSpeedKmh = 0.0;
 
-    // Load simulation configs
+    // Load configs
     final sim = _ref.read(simulationProvider);
+    final tuning = _ref.read(riskTuningProvider);
+    final securityState = _ref.read(securityProvider);
 
     if (prevLocation != null) {
       final repository = _ref.read(locationRepositoryProvider);
@@ -187,39 +226,42 @@ class AntispoofingNotifier extends StateNotifier<RiskState> {
       sensorInconsistent = true;
     }
 
-    // Check OS Mock Flag (K1)
+    // Check OS Mock Flag (K1) and Mock App (K2)
     final bool osMocked = sim.simulateMockLocation
         ? true
         : newLocation.isMocked;
+    final bool mockApp = sim.simulateMockLocation && !newLocation.isMocked;
     final bool devModeActive = sim.simulateDevMode ? true : _devModeActive;
+    final bool isCompromised =
+        securityState.isJailbroken || securityState.isEmulator;
+    final bool isVpnActive = securityState.isVpnActive;
 
-    // Calculate Normalized Weighted Risk Score (0-100)
-    int score = 0;
+    // Calculate Normalized Weighted Risk Score Dynamically using RiskTuningConfig (K1-K7)
+    final int score = tuning.calculateTotalScore(
+      isK1: osMocked,
+      isK2: mockApp,
+      isK3: devModeActive,
+      isK4: speedImpossible,
+      isK5: sensorInconsistent,
+      isK6: isCompromised,
+      isK7: isVpnActive,
+    );
 
-    if (osMocked) {
-      score += 75;
-    }
-    if (speedImpossible) {
-      score += 70;
-    }
-    if (devModeActive) {
-      score += 35;
-    }
-    if (sensorInconsistent) {
-      score += 40;
-    }
-
-    if (score > 100) score = 100;
+    final category = tuning.getCategory(score);
 
     state = RiskState(
       currentLocation: newLocation,
       previousLocation: prevLocation,
       computedSpeedKmh: computedSpeedKmh,
       isOsMocked: osMocked,
+      isMockApp: mockApp,
       isDevModeActive: devModeActive,
       isSpeedImpossible: speedImpossible,
       isSensorInconsistent: sensorInconsistent,
+      isCompromised: isCompromised,
+      isVpnActive: isVpnActive,
       riskScore: score,
+      riskCategory: category,
     );
   }
 

@@ -11,6 +11,7 @@ void main() async {
   // Initialize Hive local database
   await Hive.initFlutter();
   await Hive.openBox('check_in_box');
+  await Hive.openBox('settings_box');
 
   // Initialize Local Notifications
   await NotificationService().initialize();

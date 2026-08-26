@@ -53,9 +53,26 @@ Algılanan anomaliler normalize edilerek 0 ile 100 arasında bir risk skoru üre
 ### 7. ⚙️ Otomatik CI/CD Pipeline (GitHub Actions)
 *   `.github/workflows/ci_cd.yml` dosyası ile tam otomatik 3 aşamalı DevOps boru hattı kurulmuştur:
     1.  **🔍 Lint & Format & Statik Analiz:** Dart formatting (`dart format`) ve `flutter analyze` linter kontrolleri.
-    2.  **🧪 Otomatik Test & Coverage:** 15 testten oluşan birim/widget testlerinin icrası ve `lcov.info` test kapsama raporunun artifact olarak yüklenmesi.
+    2.  **🧪 Otomatik Test & Coverage:** 23 testten oluşan birim/widget testlerinin icrası ve `lcov.info` test kapsama raporunun artifact olarak yüklenmesi.
     3.  **📱 Android Build & Artifact:** Debug ve Release APK (`app-release.apk`) derlenip 14 gün saklanmak üzere GitHub Actions Artifacts bölümüne otomatik yüklenmesi.
 *   `push` (kod gönderimi) ve `pull_request` açıldığında otomatik tetiklenir; ayrıca GitHub UI üzerinden `workflow_dispatch` ile manuel de çalıştırılabilir.
+
+### 8. 🎛️ Dinamik Risk Tuning & Kalibrasyon Paneli (K1 - K7)
+*   **Gerçek Zamanlı Kalibrasyon:** Antispoofing güvenlik motorunun kullandığı tüm katsayılar (`K1 - K7`) ve güvenlik eşik limitleri çalışma zamanında slider'lar ile anlık olarak yeniden kalibre edilebilir:
+    *   **K1:** OS Mock Provider Bayrağı (Varsayılan: 75 Puan)
+    *   **K2:** Mock GPS Uygulama Paketi (Varsayılan: 50 Puan)
+    *   **K3:** Geliştirici Modu & USB Hata Ayıklama (Varsayılan: 35 Puan)
+    *   **K4:** İmkânsız Hız & Sıçrama (> 150 km/h) (Varsayılan: 70 Puan)
+    *   **K5:** İvmeölçer Sensör Tutarsızlığı (Varsayılan: 40 Puan)
+    *   **K6:** Cihaz Bütünlüğü (Root / Emülatör) (Varsayılan: 60 Puan)
+    *   **K7:** Ağ Güvenliği (VPN / Proxy Tüneli) (Varsayılan: 45 Puan)
+*   **Ön Ayar Profilleri (Presets):**
+    *   🛡️ **Dengeli (Standart):** Standart mobil güvenlik kuralları.
+    *   🔒 **Katı Kurumsal (Strict):** Yüksek toleranssız, en küçük anormallikte işlemi engelleyen sıkı profil.
+    *   ⚡ **Esnek / Saha Testi (Permissive):** Saha testleri ve düşük yanlış pozitif toleransı için optimize edilmiş profil.
+    *   🧪 **Özel (Custom):** Yöneticinin slider'lar ile özelleştirdiği parametreler.
+*   **Canlı Test Alanı (Interactive Sandbox):** Arayüz üzerinde K1-K7 anomalilerini canlı açıp kapatarak ortaya çıkan toplam risk puanını ve sistemin vereceği kararı (`🟢 Güvenli`, `🟡 Şüpheli`, `🔴 Sahte / Engellendi`) anlık izleme.
+*   **Kalıcı Depolama:** Yapılan tüm kalibrasyonlar Hive veritabanına kaydedilir ve uygulama yeniden başlatıldığında korunur.
 
 ---
 
@@ -75,11 +92,11 @@ API anahtarlarının repoya sızmasını önlemek amacıyla güvenli enjeksiyon 
 ## 🧪 Test Etme Kılavuzu
 
 ### 1. Otomatik Testlerin Çalıştırılması (Birim ve Mantık Testleri)
-Projedeki tüm birim, güvenlik, şifreleme, bildirim ve ısı haritası algoritmalarını test etmek için:
+Projedeki tüm birim, güvenlik, şifreleme, bildirim, risk tuning ve ısı haritası algoritmalarını test etmek için:
 ```powershell
 flutter test
 ```
-*(Antispoofing, AES-256 Şifreleme, Biyometrik Doğrulama, Heatmap Kümeleme/Filtreleme, Geofence Bildirimleri ve Smoke testleri dahil toplam 15 test çalıştırılır.)*
+*(Antispoofing, Dinamik Risk Tuning & Katsayılar, AES-256 Şifreleme, Biyometrik Doğrulama, Heatmap Kümeleme/Filtreleme, Geofence Bildirimleri ve Smoke testleri dahil toplam 23 test çalıştırılır.)*
 
 ### 2. 📱 Simülasyon ve Demo Modu ile Manuel Test
 Uygulamayı emülatörde veya cihazda test ederken Fake GPS açmaya gerek kalmadan tüm senaryoları denemek için yerleşik **Simülasyon Modu** entegre edilmiştir:
@@ -120,7 +137,19 @@ Uygulamayı emülatörde veya cihazda test ederken Fake GPS açmaya gerek kalmad
 2.  Tarayıcınızda GitHub reponuzu açıp **Actions** sekmesine tıklayın.
 3.  **"Waypoint CI/CD Pipeline 🛰️🛡️"** iş akışının otomatik olarak başladığını görün:
     *   🟢 **Lint, Format & Static Analysis:** Kod formatı ve `flutter analyze` adımı tamamlanır.
-    *   🟢 **Automated Test Suite & Coverage:** 15 testin tamamı Linux üzerinde koşar ve test kapsama raporu üretilir.
+    *   🟢 **Automated Test Suite & Coverage:** 23 testin tamamı Linux üzerinde koşar ve test kapsama raporu üretilir.
     *   🟢 **Build Android APK & Artifact:** Release ve Debug APK dosyaları derlenir ve sayfanın en altındaki **Artifacts** bölümünden doğrudan indirilebilir hale gelir.
 4.  Dilerseniz Actions sekmesinde iş akışını seçip **"Run workflow"** butonuna basarak dilediğiniz zaman manuel tetikleme de yapabilirsiniz.
+
+### 6. 🎛️ Dinamik Risk Tuning & Kalibrasyon Manuel Test Adımları
+1.  Uygulamanın **Ayarlar** sekmesini açın.
+2.  **"DİNAMİK RİSK TUNING & KALİBRASYON"** kartına dokunarak kalibrasyon ekranına geçin.
+3.  Üstteki ön ayar profillerinden **"🔒 Katı"** veya **"⚡ Saha"** profillerine tıklayın:
+    *   Tüm K1-K7 slider'larının ve eşik değerlerinin otomatik olarak güncellendiğini görün.
+4.  **Canlı Kalibrasyon Test Alanı** içerisindeki çiplere (örn: `K1: OS Mock`, `K4: Hız`, `K7: VPN`) dokunarak simülasyon yapın:
+    *   Sol taraftaki dairesel puan göstergesinin (`75/100`) ve sağdaki durum etiketinin (`🟢 Güvenli`, `🟡 Şüpheli`, `🔴 Sahte / Engellendi`) anlık olarak değiştiğini izleyin.
+5.  Herhangi bir katsayı slider'ını (örn: K1 katsayısını 75'ten 20'ye) düşürün:
+    *   Profilin otomatik olarak **"🧪 Özel"** moduna geçtiğini ve puan hesaplamasının anında düştüğünü gözlemleyin.
+6.  Alttaki **"Kalibrasyonu Kaydet & Canlı Uygula"** butonuna basın.
+7.  Harita ekranına döndüğünüzde uygulamanın yeni belirlediğiniz ağırlıklarla ve eşiklerle anında çalıştığını doğrulayın.
 

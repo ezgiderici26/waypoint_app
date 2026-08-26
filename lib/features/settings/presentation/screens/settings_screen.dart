@@ -5,6 +5,8 @@ import '../../../location_map/presentation/providers/location_providers.dart';
 import '../../../location_map/presentation/providers/geofence_providers.dart';
 import '../../../../core/services/notification_service.dart';
 import '../../../../core/providers/simulation_provider.dart';
+import '../providers/risk_tuning_providers.dart';
+import 'risk_tuning_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -184,6 +186,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final simConfig = ref.watch(simulationProvider);
     final simNotifier = ref.read(simulationProvider.notifier);
 
+    // Watch Dynamic Risk Tuning Provider
+    final tuning = ref.watch(riskTuningProvider);
+
     return Scaffold(
       appBar: AppBar(title: const Text("AYARLAR VE HEDEFLER")),
       body: ListView(
@@ -290,6 +295,129 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ],
                   ),
                 ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Section: Dynamic Risk Tuning (K1-K7)
+          const Text(
+            "DİNAMİK RİSK TUNING & KALİBRASYON",
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.5,
+              color: AppTheme.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const RiskTuningScreen(),
+                  ),
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppTheme.primary.withAlpha(35),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.tune_rounded,
+                                color: AppTheme.primary,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "K1 - K7 Ağırlık Katsayıları",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppTheme.textPrimary,
+                                  ),
+                                ),
+                                Text(
+                                  "Profil: ${tuning.profileKey.toUpperCase()} (Eşik: ≤${tuning.safeThreshold} Güvenli)",
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppTheme.primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const Icon(
+                          Icons.chevron_right_rounded,
+                          color: AppTheme.textSecondary,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      "OS Mock, İmkânsız Hız, İvmeölçer, Root, VPN gibi güvenlik katsayılarını ve eşik değerlerini gerçek zamanlı kalibre edin.",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: [
+                        _buildMiniWeightBadge(
+                          "K1: ${tuning.k1OsMock}",
+                          Colors.redAccent,
+                        ),
+                        _buildMiniWeightBadge(
+                          "K2: ${tuning.k2MockApp}",
+                          Colors.deepOrangeAccent,
+                        ),
+                        _buildMiniWeightBadge(
+                          "K3: ${tuning.k3DevMode}",
+                          Colors.amber,
+                        ),
+                        _buildMiniWeightBadge(
+                          "K4: ${tuning.k4Speed}",
+                          Colors.purpleAccent,
+                        ),
+                        _buildMiniWeightBadge(
+                          "K5: ${tuning.k5Sensor}",
+                          Colors.cyanAccent,
+                        ),
+                        _buildMiniWeightBadge(
+                          "K6: ${tuning.k6Integrity}",
+                          Colors.orangeAccent,
+                        ),
+                        _buildMiniWeightBadge(
+                          "K7: ${tuning.k7Vpn}",
+                          Colors.blueAccent,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -606,6 +734,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMiniWeightBadge(String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withAlpha(25),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withAlpha(80)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.bold,
+          fontSize: 11,
+        ),
       ),
     );
   }
