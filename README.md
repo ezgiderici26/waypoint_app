@@ -31,6 +31,16 @@ Algılanan anomaliler normalize edilerek 0 ile 100 arasında bir risk skoru üre
 *   Hedef kontrol noktası geofence alanı haritada yarı saydam çember (Circle) olarak çizilir.
 *   Kullanıcı geofence alanı dışındayken "Check-in Yap" butonu kilitlenir ve kalan mesafe anlık gösterilir (Örn: *Hedefe 120 m uzaktasın*).
 
+### 5. 🌡️ Yönetici Isı Haritası (Heatmap) & Güvenlik Analitiği
+*   **Çok Katmanlı Radyal Isı Görselleştirmesi:** Google Maps üzerinde radyal gradyan çemberler (`Circle`) ile check-in yoğunluğu ve güvenlik tehditleri modellenir.
+*   **Görünüm Modları:**
+    *   🔥 **Yoğunluk Modu:** Check-in sayısına göre dinamik renk skalası (Mavi [Düşük] ➔ Yeşil [Orta] ➔ Turuncu [Yüksek] ➔ Kırmızı [Kritik Hotspot]).
+    *   🛡️ **Risk / Tehdit Modu:** Tehditlerin toplandığı bölgeleri vurgular (Yeşil: Güvenli, Turuncu: Şüpheli, Parlayan Kırmızı: Sahte GPS/VPN ihlali olan saldırı noktaları).
+    *   📍 **Noktasal Mod:** Bireysel check-in lokasyonları.
+*   **Filtreler & Hızlı Odaklanma:** Tümü, Sadece Güvenli, Sadece Tehditler, Son 24 Saat filtreleri ve Kadıköy, Beşiktaş, Taksim, Levent, Maslak hızlı atlama butonları.
+*   **Yönetici KPI Göstergeleri:** Toplam Check-in, Güvenlik Oranı (%), Engellenen Tehdit Sayısı, Ortalama Risk Skoru, En Yoğun Hotspot ve Cihaz Güvenlik İhlalleri dökümü.
+*   **Etkileşimli Küme Detayı:** Haritadaki herhangi bir ısı kümesine tıklandığında içindeki tüm check-in kayıtları, zamanları, risk puanları ve donanım bütünlük durumları modal pencerede listelenir.
+
 ---
 
 ## 🛠️ Kurulum ve Yapılandırma
@@ -49,16 +59,30 @@ API anahtarlarının repoya sızmasını önlemek amacıyla güvenli enjeksiyon 
 ## 🧪 Test Etme Kılavuzu
 
 ### 1. Otomatik Testlerin Çalıştırılması (Birim ve Mantık Testleri)
-Projedeki K1 OS Mock ve K4 Işınlanma algoritmalarının doğruluğunu test etmek için terminalde şu komutu çalıştırın:
+Projedeki tüm birim, güvenlik, şifreleme ve ısı haritası algoritmalarını test etmek için:
 ```powershell
-flutter test test/antispoofing_test.dart
+flutter test
 ```
+*(Antispoofing, AES-256 Şifreleme, Biyometrik Doğrulama, Heatmap Kümeleme/Filtreleme ve Smoke testleri dahil toplam 12 test çalıştırılır.)*
 
-### 2. 📱 Simülasyon ve Demo Modu ile Manuel Test (Önerilen)
+### 2. 📱 Simülasyon ve Demo Modu ile Manuel Test
 Uygulamayı emülatörde veya cihazda test ederken Fake GPS açmaya gerek kalmadan tüm senaryoları denemek için yerleşik **Simülasyon Modu** entegre edilmiştir:
 1.  Uygulamanın **Ayarlar** sekmesine gidin.
 2.  En alttaki **"SİMÜLASYON / TEST SEÇENEKLERİ (DEMO)"** panelinden test etmek istediğiniz tehditleri tetikleyin:
     *   **Sahte Konum Tetikle (K1)**
     *   **İmkânsız Hız/Işınlanma Tetikle (K4)**
     *   **VPN / Proxy Bağlantısı Tetikle** (Dashboard'da tun0/ppp0 uyarısı yanar ve check-in kilitlenir)
-    *   **API Sunucusunu Çevrimdışı Simüle Et** (Açıldığında check-in kayıtları kuyrukta birikir; kapatılıp geçmiş ekranındaki döner oka basıldığında sunucuyla başarıyla senkronize olur).
+    *   **Biyometrik Hata Simüle Et** (Parmak izi başarısız senaryolarını test eder)
+    *   **API Sunucusunu Çevrimdışı Simüle Et** (Açıldığında check-in kayıtları kuyrukta birikir; kapatılıp geçmiş ekranındaki döner oka basıldığında sunucuyla senkronize olur).
+
+### 3. 🌡️ Yönetici Isı Haritası (Heatmap) Manuel Test Adımları
+1.  Alt navigasyon çubuğundan **"Isı Haritası"** sekmesine (veya Harita/Geçmiş ekranlarındaki alev ikonuna) tıklayın.
+2.  Sağ üstteki **🧪 (Beher / Demo Verisi)** butonuna basın. (İstanbul geneli 22 adet gerçekçi check-in kümesi yüklenecektir.)
+3.  **Yoğunluk** ve **Risk / Tehdit** modları arasında geçiş yapın:
+    *   *Yoğunluk modunda* Kadıköy Meydanı'nın yüksek yoğunlukla alev aldığını gözlemleyin.
+    *   *Risk / Tehdit modunda* Taksim Meydanı ve Maslak bölgelerinin kırmızı alarm halkalarıyla parladığını görün.
+4.  Filtre çiğlerinden **"🔴 Tehditler"** ve **"🟢 Güvenli"** filtrelerini deneyin.
+5.  Alt kısımdaki **Kadıköy, Beşiktaş, Taksim, Levent** hızlı odak butonlarına basarak kameranın ilgili bölgelere yumuşak geçişini test edin.
+6.  Haritadaki herhangi bir pine veya renkli halkaya tıklayarak **küme içi detaylı cihaz ve risk loglarını** inceleyin.
+7.  Alttaki analitik çubuğuna tıklayarak açılan **Yönetici Isı & Analitik Paneli** üzerinden ısı yayılım çarpanı slider'ını ve KPI kartlarını test edin.
+

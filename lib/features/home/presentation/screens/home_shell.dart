@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../location_map/presentation/screens/main_map_screen.dart';
 import '../../../check_in/presentation/screens/history_screen.dart';
+import '../../../heatmap/presentation/screens/admin_heatmap_screen.dart';
 import '../../../security/presentation/screens/security_dashboard_screen.dart';
 import '../../../settings/presentation/screens/settings_screen.dart';
 
@@ -17,6 +18,7 @@ class _HomeShellState extends State<HomeShell> {
   final List<Widget> _screens = const [
     MainMapScreen(),
     HistoryScreen(),
+    AdminHeatmapScreen(),
     SecurityDashboardScreen(),
     SettingsScreen(),
   ];
@@ -48,6 +50,11 @@ class _HomeShellState extends State<HomeShell> {
               icon: Icon(Icons.history_outlined),
               activeIcon: Icon(Icons.history_rounded),
               label: 'Geçmiş',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.whatshot_outlined),
+              activeIcon: Icon(Icons.whatshot_rounded),
+              label: 'Isı Haritası',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.shield_outlined),

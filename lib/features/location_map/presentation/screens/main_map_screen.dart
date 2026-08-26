@@ -8,6 +8,8 @@ import '../../../check_in/presentation/providers/check_in_providers.dart';
 import '../../../security/presentation/providers/security_providers.dart';
 import '../../../../core/services/biometric_service.dart';
 
+import '../../../heatmap/presentation/screens/admin_heatmap_screen.dart';
+
 class MainMapScreen extends ConsumerStatefulWidget {
   const MainMapScreen({super.key});
 
@@ -106,6 +108,17 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
         title: const Text("WAYPOINT HARİTA"),
         actions: [
           IconButton(
+            tooltip: "Yönetici Isı Haritası",
+            icon: const Icon(Icons.whatshot_rounded, color: AppTheme.primary),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AdminHeatmapScreen()),
+              );
+            },
+          ),
+          IconButton(
+            tooltip: "Konumuma Odaklan",
             icon: const Icon(Icons.my_location_rounded),
             onPressed: () {
               if (userLatLng != null && _mapController != null) {

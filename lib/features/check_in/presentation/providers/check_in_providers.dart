@@ -86,6 +86,20 @@ class CheckInHistoryNotifier extends StateNotifier<List<CheckInRecord>> {
     await syncPendingRecords();
   }
 
+  Future<void> addBulkRecords(List<CheckInRecord> records) async {
+    for (final record in records) {
+      final jsonString = jsonEncode(record.toJson());
+      final encryptedData = EncryptionHelper.encrypt(jsonString);
+      await _box.put(record.id, encryptedData);
+    }
+    _loadRecords();
+  }
+
+  Future<void> clearAllRecords() async {
+    await _box.clear();
+    _loadRecords();
+  }
+
   Future<bool> syncPendingRecords() async {
     if (_isSyncing) return false;
     _isSyncing = true;

@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../providers/check_in_providers.dart';
 
+import '../../../heatmap/presentation/screens/admin_heatmap_screen.dart';
+
 class HistoryScreen extends ConsumerWidget {
   const HistoryScreen({super.key});
 
@@ -16,6 +18,17 @@ class HistoryScreen extends ConsumerWidget {
         title: const Text("GEÇMİŞ KAYITLAR"),
         actions: [
           IconButton(
+            tooltip: "Isı Haritası",
+            icon: const Icon(Icons.whatshot_rounded, color: AppTheme.primary),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AdminHeatmapScreen()),
+              );
+            },
+          ),
+          IconButton(
+            tooltip: "Senkronize Et",
             icon: const Icon(Icons.sync_rounded),
             onPressed: () async {
               ScaffoldMessenger.of(context).showSnackBar(
