@@ -112,6 +112,34 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
         title: const Text("WAYPOINT HARİTA"),
         actions: [
           IconButton(
+            tooltip: "Bulunduğum Konumu Hedef Geofence Yap",
+            icon: const Icon(
+              Icons.add_location_alt_rounded,
+              color: AppTheme.safe,
+            ),
+            onPressed: () {
+              final currentLoc = locationAsync.value;
+              if (currentLoc != null) {
+                ref
+                    .read(targetLocationProvider.notifier)
+                    .state = TargetLocation(
+                  name: "Mevcut Konumum (Canlı GPS)",
+                  latitude: currentLoc.latitude,
+                  longitude: currentLoc.longitude,
+                  radius: target.radius,
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      "📍 Bulunduğunuz yer (${currentLoc.latitude.toStringAsFixed(4)}, ${currentLoc.longitude.toStringAsFixed(4)}) hedef kontrol alanı yapıldı!",
+                    ),
+                    backgroundColor: AppTheme.safe,
+                  ),
+                );
+              }
+            },
+          ),
+          IconButton(
             tooltip: "Yönetici Isı Haritası",
             icon: const Icon(Icons.whatshot_rounded, color: AppTheme.primary),
             onPressed: () {
@@ -358,6 +386,29 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                                 _buildDistanceText(
                                   distanceToTarget,
                                   target.radius,
+                                  onSetCurrentAsTarget: () {
+                                    final currentLoc = locationAsync.value;
+                                    if (currentLoc != null) {
+                                      ref
+                                          .read(targetLocationProvider.notifier)
+                                          .state = TargetLocation(
+                                        name: "Mevcut Konumum (Canlı GPS)",
+                                        latitude: currentLoc.latitude,
+                                        longitude: currentLoc.longitude,
+                                        radius: target.radius,
+                                      );
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            "📍 Bulunduğunuz yer (${currentLoc.latitude.toStringAsFixed(4)}, ${currentLoc.longitude.toStringAsFixed(4)}) hedef kontrol alanı yapıldı!",
+                                          ),
+                                          backgroundColor: AppTheme.safe,
+                                        ),
+                                      );
+                                    }
+                                  },
                                 ),
                               ],
                             ),
@@ -521,7 +572,11 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
     );
   }
 
-  Widget _buildDistanceText(double? distance, double radius) {
+  Widget _buildDistanceText(
+    double? distance,
+    double radius, {
+    VoidCallback? onSetCurrentAsTarget,
+  }) {
     if (distance == null) {
       return const Text(
         "Mesafe Hesaplanıyor...",
@@ -530,15 +585,55 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
     }
 
     final bool isInside = distance <= radius;
-    return Text(
-      isInside
-          ? "Hedefe ${distance.toStringAsFixed(0)} m (Yarıçap içinde)"
-          : "Hedefe ${distance.toStringAsFixed(0)} m uzaktasın",
-      style: TextStyle(
-        color: isInside ? AppTheme.safe : AppTheme.suspicious,
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-      ),
+    if (isInside) {
+      return Text(
+        "Hedefe ${distance.toStringAsFixed(0)} m (Yarıçap içinde)",
+        style: const TextStyle(
+          color: AppTheme.safe,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    }
+
+    final String distStr = (distance >= 1000)
+        ? "${(distance / 1000).toStringAsFixed(1)} km"
+        : "${distance.toStringAsFixed(0)} m";
+
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Text(
+          "Hedefe $distStr uzaktasın",
+          style: const TextStyle(
+            color: AppTheme.suspicious,
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        if (onSetCurrentAsTarget != null) ...[
+          const SizedBox(width: 6),
+          GestureDetector(
+            onTap: onSetCurrentAsTarget,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppTheme.primary.withAlpha(40),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: AppTheme.primary, width: 0.8),
+              ),
+              child: const Text(
+                "📍 Burayı Hedef Yap",
+                style: TextStyle(
+                  color: AppTheme.primary,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 

@@ -221,7 +221,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
-                    initialValue: target.name,
+                    initialValue: target.name.contains("Mevcut")
+                        ? null
+                        : (target.name.isNotEmpty
+                              ? target.name
+                              : "Kadıköy Meydan"),
+                    hint: Text(
+                      target.name,
+                      style: const TextStyle(color: AppTheme.primary),
+                    ),
                     dropdownColor: AppTheme.surface,
                     decoration: const InputDecoration(
                       enabledBorder: UnderlineInputBorder(
@@ -241,6 +249,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         value: "Taksim Metro",
                         child: Text("Taksim Metro (41.0370, 28.9850)"),
                       ),
+                      DropdownMenuItem(
+                        value: "İzmir Konak Meydanı",
+                        child: Text("İzmir Konak Meydanı (38.4189, 27.1287)"),
+                      ),
+                      DropdownMenuItem(
+                        value: "İzmir Alsancak Kordon",
+                        child: Text("İzmir Alsancak Kordon (38.4375, 27.1420)"),
+                      ),
+                      DropdownMenuItem(
+                        value: "İzmir Bornova Meydan",
+                        child: Text("İzmir Bornova Meydan (38.4650, 27.2160)"),
+                      ),
+                      DropdownMenuItem(
+                        value: "Ankara Kızılay",
+                        child: Text("Ankara Kızılay (39.9208, 32.8541)"),
+                      ),
                     ],
                     onChanged: (val) {
                       if (val != null) {
@@ -252,6 +276,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         } else if (val == "Taksim Metro") {
                           lat = 41.0370;
                           lng = 28.9850;
+                        } else if (val == "İzmir Konak Meydanı") {
+                          lat = 38.4189;
+                          lng = 27.1287;
+                        } else if (val == "İzmir Alsancak Kordon") {
+                          lat = 38.4375;
+                          lng = 27.1420;
+                        } else if (val == "İzmir Bornova Meydan") {
+                          lat = 38.4650;
+                          lng = 27.2160;
+                        } else if (val == "Ankara Kızılay") {
+                          lat = 39.9208;
+                          lng = 32.8541;
                         }
 
                         targetNotifier.state = TargetLocation(
@@ -263,7 +299,58 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       }
                     },
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        final locAsync = ref.read(locationStreamProvider);
+                        final currentLoc = locAsync.value;
+                        if (currentLoc != null) {
+                          targetNotifier.state = TargetLocation(
+                            name: "Mevcut Konumum (Canlı GPS)",
+                            latitude: currentLoc.latitude,
+                            longitude: currentLoc.longitude,
+                            radius: target.radius,
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                "✅ Bulunduğunuz yer (${currentLoc.latitude.toStringAsFixed(4)}, ${currentLoc.longitude.toStringAsFixed(4)}) hedef kontrol alanı yapıldı!",
+                              ),
+                              backgroundColor: AppTheme.safe,
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("GPS konumu bekleniyor..."),
+                            ),
+                          );
+                        }
+                      },
+                      icon: const Icon(
+                        Icons.my_location_rounded,
+                        size: 16,
+                        color: AppTheme.primary,
+                      ),
+                      label: const Text(
+                        "📍 Mevcut GPS Konumumu Hedef Alan Yap",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primary,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppTheme.primary),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
