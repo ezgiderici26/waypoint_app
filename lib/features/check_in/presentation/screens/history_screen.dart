@@ -74,156 +74,238 @@ class HistoryScreen extends ConsumerWidget {
                 ],
               ),
             )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: logs.length,
-              itemBuilder: (context, index) {
-                final log = logs[index];
-                final int risk = log.riskScore;
-
-                Color statusColor;
-                String statusText;
-                if (log.isBlocked) {
-                  statusColor = AppTheme.spoofed;
-                  statusText = "ENGELLENDİ";
-                } else if (risk < 35) {
-                  statusColor = AppTheme.safe;
-                  statusText = "GÜVENLİ";
-                } else if (risk < 70) {
-                  statusColor = AppTheme.suspicious;
-                  statusText = "ŞÜPHELİ";
-                } else {
-                  statusColor = AppTheme.spoofed;
-                  statusText = "REDDEDİLDİ";
-                }
-
-                // Format timestamp beautifully (simple slice of ISO string)
-                String formattedTime = log.timestamp;
-                try {
-                  final parsed = DateTime.parse(log.timestamp);
-                  formattedTime =
-                      "${parsed.day.toString().padLeft(2, '0')}.${parsed.month.toString().padLeft(2, '0')}.${parsed.year} ${parsed.hour.toString().padLeft(2, '0')}:${parsed.minute.toString().padLeft(2, '0')}";
-                } catch (_) {}
-
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          : Column(
+              children: [
+                // Top AES-256 Encryption Status Banner
+                Container(
+                  margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0F172A),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppTheme.primary.withAlpha(80)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(100),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.enhanced_encryption_rounded,
+                        color: AppTheme.primary,
+                        size: 22,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: Text(
-                                log.targetName,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppTheme.textPrimary,
-                                ),
-                                overflow: TextOverflow.ellipsis,
+                            const Text(
+                              "AES-256 CBC Şifreli Yerel Depolama",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.textPrimary,
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: statusColor.withAlpha(26),
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(
-                                  color: statusColor,
-                                  width: 1,
-                                ),
-                              ),
-                              child: Text(
-                                statusText,
-                                style: TextStyle(
-                                  color: statusColor,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            Text(
+                              "Hive DB üzerindeki tüm kayıtlar & donanım imzaları şifrelenmiştir.",
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: AppTheme.textSecondary.withAlpha(190),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          "Koordinat: ${log.latitude.toStringAsFixed(5)}, ${log.longitude.toStringAsFixed(5)}",
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: AppTheme.textSecondary,
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppTheme.safe.withAlpha(30),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: AppTheme.safe, width: 0.8),
+                        ),
+                        child: const Text(
+                          "KORUMALI",
+                          style: TextStyle(
+                            color: AppTheme.safe,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          "Zaman: $formattedTime",
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: AppTheme.textSecondary,
-                          ),
-                        ),
-                        if (log.deviceStatus.isNotEmpty) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            "Güvenlik: ${log.deviceStatus}",
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppTheme.textSecondary,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                        ],
-                        const Divider(height: 20, color: Color(0xFF2A3547)),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Risk Skoru: $risk/100",
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                color: risk >= 35
-                                    ? AppTheme.spoofed
-                                    : AppTheme.textPrimary,
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: logs.length,
+                    itemBuilder: (context, index) {
+                      final log = logs[index];
+                      final int risk = log.riskScore;
+
+                      Color statusColor;
+                      String statusText;
+                      if (log.isBlocked) {
+                        statusColor = AppTheme.spoofed;
+                        statusText = "ENGELLENDİ";
+                      } else if (risk < 35) {
+                        statusColor = AppTheme.safe;
+                        statusText = "GÜVENLİ";
+                      } else if (risk < 70) {
+                        statusColor = AppTheme.suspicious;
+                        statusText = "ŞÜPHELİ";
+                      } else {
+                        statusColor = AppTheme.spoofed;
+                        statusText = "REDDEDİLDİ";
+                      }
+
+                      // Format timestamp beautifully (simple slice of ISO string)
+                      String formattedTime = log.timestamp;
+                      try {
+                        final parsed = DateTime.parse(log.timestamp);
+                        formattedTime =
+                            "${parsed.day.toString().padLeft(2, '0')}.${parsed.month.toString().padLeft(2, '0')}.${parsed.year} ${parsed.hour.toString().padLeft(2, '0')}:${parsed.minute.toString().padLeft(2, '0')}";
+                      } catch (_) {}
+
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      log.targetName,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppTheme.textPrimary,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: statusColor.withAlpha(26),
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(
+                                        color: statusColor,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      statusText,
+                                      style: TextStyle(
+                                        color: statusColor,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            Row(
-                              children: [
-                                Icon(
-                                  log.isSynced
-                                      ? Icons.cloud_done_rounded
-                                      : Icons.cloud_off_rounded,
-                                  size: 16,
-                                  color: log.isSynced
-                                      ? AppTheme.primary
-                                      : AppTheme.suspicious,
+                              const SizedBox(height: 8),
+                              Text(
+                                "Koordinat: ${log.latitude.toStringAsFixed(5)}, ${log.longitude.toStringAsFixed(5)}",
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: AppTheme.textSecondary,
                                 ),
-                                const SizedBox(width: 4),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "Zaman: $formattedTime",
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: AppTheme.textSecondary,
+                                ),
+                              ),
+                              if (log.deviceStatus.isNotEmpty) ...[
+                                const SizedBox(height: 4),
                                 Text(
-                                  log.isSynced
-                                      ? "Sunucuyla Eşleşti"
-                                      : "Kuyrukta Bekliyor",
-                                  style: TextStyle(
+                                  "Güvenlik: ${log.deviceStatus}",
+                                  style: const TextStyle(
                                     fontSize: 12,
-                                    color: log.isSynced
-                                        ? AppTheme.primary
-                                        : AppTheme.suspicious,
+                                    color: AppTheme.textSecondary,
+                                    fontStyle: FontStyle.italic,
                                   ),
                                 ),
                               ],
-                            ),
-                          ],
+                              const Divider(
+                                height: 20,
+                                color: Color(0xFF2A3547),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Risk Skoru: $risk/100",
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                      color: risk >= 35
+                                          ? AppTheme.spoofed
+                                          : AppTheme.textPrimary,
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        log.isSynced
+                                            ? Icons.cloud_done_rounded
+                                            : Icons.cloud_off_rounded,
+                                        size: 16,
+                                        color: log.isSynced
+                                            ? AppTheme.primary
+                                            : AppTheme.suspicious,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        log.isSynced
+                                            ? "Sunucuyla Eşleşti"
+                                            : "Kuyrukta Bekliyor",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: log.isSynced
+                                              ? AppTheme.primary
+                                              : AppTheme.suspicious,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
-                );
-              },
+                ),
+              ],
             ),
     );
   }
