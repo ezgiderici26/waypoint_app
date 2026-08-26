@@ -6,6 +6,7 @@ import '../providers/location_providers.dart';
 import '../providers/antispoofing_providers.dart';
 import '../../../check_in/presentation/providers/check_in_providers.dart';
 import '../../../security/presentation/providers/security_providers.dart';
+import '../../../../core/services/biometric_service.dart';
 
 class MainMapScreen extends ConsumerStatefulWidget {
   const MainMapScreen({super.key});
@@ -297,7 +298,37 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                           ),
                           const SizedBox(width: 8),
                           ElevatedButton(
-                            onPressed: isInsideGeofence ? () {
+                            onPressed: isInsideGeofence ? () async {
+                              final biometricService = ref.read(biometricServiceProvider);
+                              
+                              // Check availability of biometric hardware first
+                              final bool available = await biometricService.isBiometricsAvailable();
+                              if (!available) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text("Biyometrik donanım bulunamadı veya etkinleştirilmedi!"),
+                                      backgroundColor: AppTheme.spoofed,
+                                    ),
+                                  );
+                                }
+                                return;
+                              }
+
+                              // Trigger biometric scan prompt
+                              final bool success = await biometricService.authenticate();
+                              if (!success) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text("Biyometrik doğrulama reddedildi! İşlem iptal edildi."),
+                                      backgroundColor: AppTheme.spoofed,
+                                    ),
+                                  );
+                                }
+                                return;
+                              }
+
                               final currentLoc = locationAsync.value;
                               final security = ref.read(securityProvider);
                               final devStatus = "Rooted: ${security.isJailbroken}, Emulator: ${security.isEmulator}, VPN: ${security.isVpnActive}";
@@ -313,16 +344,18 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                                   isBlocked: !isSafe,
                                 );
 
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      isSafe 
-                                          ? "Check-in başarılı! Kayıt veritabanına eklendi."
-                                          : "Güvenlik Engeli: Tehdit nedeniyle işlem engellendi!",
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        isSafe 
+                                            ? "Biyometrik doğrulama başarılı. Check-in eklendi!"
+                                            : "Güvenlik Engeli: Tehdit nedeniyle işlem engellendi!",
+                                      ),
+                                      backgroundColor: isSafe ? AppTheme.safe : AppTheme.spoofed,
                                     ),
-                                    backgroundColor: isSafe ? AppTheme.safe : AppTheme.spoofed,
-                                  ),
-                                );
+                                  );
+                                }
                               }
                             } : null,
                             style: ElevatedButton.styleFrom(

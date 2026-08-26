@@ -10,6 +10,7 @@ class SimulationConfig {
   final bool simulateVpn;
   final bool simulateApiOffline;
   final bool simulatePlayIntegrityFail;
+  final bool simulateBiometricFail;
 
   const SimulationConfig({
     required this.simulateMockLocation,
@@ -21,6 +22,7 @@ class SimulationConfig {
     required this.simulateVpn,
     required this.simulateApiOffline,
     required this.simulatePlayIntegrityFail,
+    required this.simulateBiometricFail,
   });
 
   factory SimulationConfig.initial() {
@@ -34,6 +36,7 @@ class SimulationConfig {
       simulateVpn: false,
       simulateApiOffline: false,
       simulatePlayIntegrityFail: false,
+      simulateBiometricFail: false,
     );
   }
 
@@ -47,6 +50,7 @@ class SimulationConfig {
     bool? simulateVpn,
     bool? simulateApiOffline,
     bool? simulatePlayIntegrityFail,
+    bool? simulateBiometricFail,
   }) {
     return SimulationConfig(
       simulateMockLocation: simulateMockLocation ?? this.simulateMockLocation,
@@ -58,6 +62,7 @@ class SimulationConfig {
       simulateVpn: simulateVpn ?? this.simulateVpn,
       simulateApiOffline: simulateApiOffline ?? this.simulateApiOffline,
       simulatePlayIntegrityFail: simulatePlayIntegrityFail ?? this.simulatePlayIntegrityFail,
+      simulateBiometricFail: simulateBiometricFail ?? this.simulateBiometricFail,
     );
   }
 }
@@ -74,6 +79,7 @@ class SimulationNotifier extends StateNotifier<SimulationConfig> {
   void toggleVpn(bool val) => state = state.copyWith(simulateVpn: val);
   void toggleApiOffline(bool val) => state = state.copyWith(simulateApiOffline: val);
   void togglePlayIntegrityFail(bool val) => state = state.copyWith(simulatePlayIntegrityFail: val);
+  void toggleBiometricFail(bool val) => state = state.copyWith(simulateBiometricFail: val);
 }
 
 final simulationProvider = StateNotifierProvider<SimulationNotifier, SimulationConfig>((ref) {

@@ -266,6 +266,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   title: const Text("Play Integrity / App Attest İhlali Tetikle"),
                   onChanged: (val) => simNotifier.togglePlayIntegrityFail(val),
                 ),
+                const Divider(height: 1, color: Color(0xFF2A3547)),
+                SwitchListTile(
+                  value: simConfig.simulateBiometricFail,
+                  activeThumbColor: AppTheme.suspicious,
+                  title: const Text("Biyometrik Hata Simüle Et"),
+                  onChanged: (val) => simNotifier.toggleBiometricFail(val),
+                ),
               ],
             ),
           ),
