@@ -7,7 +7,7 @@ import '../providers/antispoofing_providers.dart';
 import '../../../check_in/presentation/providers/check_in_providers.dart';
 import '../../../security/presentation/providers/security_providers.dart';
 import '../../../../core/services/biometric_service.dart';
-
+import '../providers/geofence_providers.dart';
 import '../../../heatmap/presentation/screens/admin_heatmap_screen.dart';
 
 class MainMapScreen extends ConsumerStatefulWidget {
@@ -28,10 +28,11 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Watch live location stream and distance
+    // 1. Watch live location stream, geofence, and distance
     final locationAsync = ref.watch(locationStreamProvider);
     final distanceToTarget = ref.watch(distanceToTargetProvider);
     final target = ref.watch(targetLocationProvider);
+    final geofenceState = ref.watch(geofenceProvider);
 
     // 2. Watch real-time antispoofing and risk scoring
     final riskState = ref.watch(antispoofingProvider);
@@ -232,6 +233,10 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                   const SizedBox(height: 10),
                   _buildWarningBanner("Sensör ve Hız Tutarsızlığı Algılandı! (K5)", Icons.sensors_off_rounded),
                 ],
+                if (geofenceState.isInside) ...[
+                  const SizedBox(height: 10),
+                  _buildGeofenceSuccessBanner("📍 Hedef Kontrol Alanı İçindesiniz (${target.name})", Icons.verified_rounded),
+                ],
               ],
             ),
           ),
@@ -398,6 +403,33 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
         color: AppTheme.spoofed.withAlpha(204),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: AppTheme.spoofed),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.white, size: 18),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGeofenceSuccessBanner(String text, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppTheme.safe.withAlpha(220),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppTheme.safe),
       ),
       child: Row(
         children: [

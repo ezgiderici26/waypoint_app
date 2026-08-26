@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'core/services/notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'features/location_map/presentation/screens/welcome_screen.dart';
 
@@ -10,6 +11,9 @@ void main() async {
   // Initialize Hive local database
   await Hive.initFlutter();
   await Hive.openBox('check_in_box');
+
+  // Initialize Local Notifications
+  await NotificationService().initialize();
 
   runApp(
     const ProviderScope(

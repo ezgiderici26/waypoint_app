@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../location_map/presentation/providers/location_providers.dart';
+import '../../../location_map/presentation/providers/geofence_providers.dart';
+import '../../../../core/services/notification_service.dart';
 import '../../../../core/providers/simulation_provider.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -14,11 +16,137 @@ class SettingsScreen extends ConsumerStatefulWidget {
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _mockPreventionEnabled = true;
 
+  void _showGeofenceLogsDialog(BuildContext context, GeofenceState geofenceState, GeofenceNotifier geofenceNotifier) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) => Container(
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.65),
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          border: Border(top: BorderSide(color: Color(0xFF2A3547), width: 1.5)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: AppTheme.textSecondary.withAlpha(100),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Row(
+                  children: [
+                    Icon(Icons.notifications_active_rounded, color: AppTheme.primary, size: 22),
+                    SizedBox(width: 10),
+                    Text(
+                      "GEOFENCE OLAY GÜNLÜĞÜ",
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.textPrimary),
+                    ),
+                  ],
+                ),
+                if (geofenceState.eventsHistory.isNotEmpty)
+                  TextButton(
+                    onPressed: () => geofenceNotifier.clearEvents(),
+                    child: const Text("Temizle", style: TextStyle(color: AppTheme.spoofed, fontSize: 12)),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            if (geofenceState.eventsHistory.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 32),
+                child: Center(
+                  child: Text(
+                    "Henüz geofence giriş/çıkış olayı kaydedilmedi.\nSimülasyon butonlarını deneyebilirsiniz.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: AppTheme.textSecondary),
+                  ),
+                ),
+              )
+            else
+              Flexible(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: geofenceState.eventsHistory.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  itemBuilder: (context, index) {
+                    final event = geofenceState.eventsHistory[index];
+                    final isEnter = event.type == 'ENTER';
+                    return Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppTheme.cardBg,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isEnter ? AppTheme.safe.withAlpha(80) : AppTheme.suspicious.withAlpha(80),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            isEnter ? Icons.login_rounded : Icons.logout_rounded,
+                            color: isEnter ? AppTheme.safe : AppTheme.suspicious,
+                            size: 24,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  isEnter ? "HEDEFE GİRİLDİ (Check-in Aktif)" : "HEDEFTEN ÇIKILDI",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                    color: isEnter ? AppTheme.safe : AppTheme.suspicious,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  "${event.targetName} • Mesafe: ${event.distanceMeters.toInt()}m",
+                                  style: const TextStyle(fontSize: 12, color: AppTheme.textPrimary),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            "${event.timestamp.hour.toString().padLeft(2, '0')}:${event.timestamp.minute.toString().padLeft(2, '0')}:${event.timestamp.second.toString().padLeft(2, '0')}",
+                            style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final target = ref.watch(targetLocationProvider);
     final targetNotifier = ref.read(targetLocationProvider.notifier);
     
+    // Watch Geofence Provider
+    final geofenceState = ref.watch(geofenceProvider);
+    final geofenceNotifier = ref.read(geofenceProvider.notifier);
+
     // Watch and read Simulation Provider
     final simConfig = ref.watch(simulationProvider);
     final simNotifier = ref.read(simulationProvider.notifier);
@@ -136,6 +264,77 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           const SizedBox(height: 24),
 
+          // Section: Geofence & Notifications Settings
+          const Text(
+            "GEOFENCE VE ARKA PLAN BİLDİRİMLERİ",
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.5,
+              color: AppTheme.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            child: Column(
+              children: [
+                SwitchListTile(
+                  value: geofenceState.notificationsEnabled,
+                  activeThumbColor: AppTheme.primary,
+                  title: const Text(
+                    "Geofence Giriş/Çıkış Bildirimleri",
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
+                  subtitle: const Text(
+                    "Hedef alana girildiğinde ve çıkıldığında anlık push bildirimi gönderir.",
+                    style: TextStyle(fontSize: 12),
+                  ),
+                  onChanged: (val) => geofenceNotifier.toggleNotifications(val),
+                ),
+                const Divider(height: 1, color: Color(0xFF2A3547)),
+                ListTile(
+                  leading: const Icon(Icons.notifications_active_rounded, color: AppTheme.primary),
+                  title: const Text(
+                    "Test Bildirimi Gönder",
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                  ),
+                  subtitle: const Text("Cihazda push bildirim izinlerini ve servisini test eder.", style: TextStyle(fontSize: 12)),
+                  trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppTheme.textSecondary),
+                  onTap: () async {
+                    await NotificationService().showTestNotification();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Test bildirimi cihaza gönderildi!"),
+                          backgroundColor: AppTheme.safe,
+                        ),
+                      );
+                    }
+                  },
+                ),
+                const Divider(height: 1, color: Color(0xFF2A3547)),
+                ListTile(
+                  leading: const Icon(Icons.history_rounded, color: AppTheme.secondary),
+                  title: const Text(
+                    "Geofence Olay Geçmişi",
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                  ),
+                  subtitle: Text(
+                    "${geofenceState.eventsHistory.length} giriş/çıkış olayı kaydedildi",
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppTheme.textSecondary),
+                  onTap: () => _showGeofenceLogsDialog(context, geofenceState, geofenceNotifier),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+
           // Section: Antispoofing Settings
           const Text(
             "ANTISPOOFING PARAMETRELERİ",
@@ -204,6 +403,60 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           Card(
             child: Column(
               children: [
+                // Geofence Instant Entry / Exit Simulation Actions
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.login_rounded, size: 16),
+                          label: const Text("Alana Giriş Simüle Et", style: TextStyle(fontSize: 12)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.safe,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                          ),
+                          onPressed: () async {
+                            await geofenceNotifier.simulateGeofenceEnter();
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("📍 Hedef alana giriş simüle edildi & bildirim gönderildi!"),
+                                  backgroundColor: AppTheme.safe,
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.logout_rounded, size: 16),
+                          label: const Text("Alandan Çıkış Simüle Et", style: TextStyle(fontSize: 12)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.suspicious,
+                            foregroundColor: Colors.black,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                          ),
+                          onPressed: () async {
+                            await geofenceNotifier.simulateGeofenceExit();
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("🚪 Hedef alandan çıkış simüle edildi & bildirim gönderildi!"),
+                                  backgroundColor: AppTheme.suspicious,
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1, color: Color(0xFF2A3547)),
                 SwitchListTile(
                   value: simConfig.simulateMockLocation,
                   activeThumbColor: AppTheme.suspicious,

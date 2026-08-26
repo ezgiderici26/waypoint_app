@@ -41,6 +41,13 @@ Algılanan anomaliler normalize edilerek 0 ile 100 arasında bir risk skoru üre
 *   **Yönetici KPI Göstergeleri:** Toplam Check-in, Güvenlik Oranı (%), Engellenen Tehdit Sayısı, Ortalama Risk Skoru, En Yoğun Hotspot ve Cihaz Güvenlik İhlalleri dökümü.
 *   **Etkileşimli Küme Detayı:** Haritadaki herhangi bir ısı kümesine tıklandığında içindeki tüm check-in kayıtları, zamanları, risk puanları ve donanım bütünlük durumları modal pencerede listelenir.
 
+### 6. 🔔 Geofence Bildirimleri ve Arka Plan Takibi
+*   **Arka Plan Geçiş Tespiti:** Kullanıcı hedef geofence alanının içine girdiğinde (`ENTER`) veya dışına çıktığında (`EXIT`) gerçek zamanlı yerel bildirimler (push notifications) tetiklenir:
+    *   📍 **Giriş Bildirimi:** *"Hedef Alana Girdiniz! (Kadıköy Meydan sınırları içindesiniz. Güvenli check-in yapabilirsiniz.)"*
+    *   🚪 **Çıkış Bildirimi:** *"Hedef Alandan Çıktınız (Kadıköy Meydan bölgesinden uzaklaştınız. Mesafe: 380m)"*
+*   **Olay Günlüğü:** Ayarlar menüsünden tüm giriş/çıkış olaylarının saat, mesafe ve hedef bilgileri listelenir.
+*   **Android & iOS İzinleri:** Android 13+ `POST_NOTIFICATIONS`, `ACCESS_BACKGROUND_LOCATION` ve `FOREGROUND_SERVICE_LOCATION` izinleriyle tam uyumluluk.
+
 ---
 
 ## 🛠️ Kurulum ve Yapılandırma
@@ -59,11 +66,11 @@ API anahtarlarının repoya sızmasını önlemek amacıyla güvenli enjeksiyon 
 ## 🧪 Test Etme Kılavuzu
 
 ### 1. Otomatik Testlerin Çalıştırılması (Birim ve Mantık Testleri)
-Projedeki tüm birim, güvenlik, şifreleme ve ısı haritası algoritmalarını test etmek için:
+Projedeki tüm birim, güvenlik, şifreleme, bildirim ve ısı haritası algoritmalarını test etmek için:
 ```powershell
 flutter test
 ```
-*(Antispoofing, AES-256 Şifreleme, Biyometrik Doğrulama, Heatmap Kümeleme/Filtreleme ve Smoke testleri dahil toplam 12 test çalıştırılır.)*
+*(Antispoofing, AES-256 Şifreleme, Biyometrik Doğrulama, Heatmap Kümeleme/Filtreleme, Geofence Bildirimleri ve Smoke testleri dahil toplam 15 test çalıştırılır.)*
 
 ### 2. 📱 Simülasyon ve Demo Modu ile Manuel Test
 Uygulamayı emülatörde veya cihazda test ederken Fake GPS açmaya gerek kalmadan tüm senaryoları denemek için yerleşik **Simülasyon Modu** entegre edilmiştir:
@@ -85,4 +92,14 @@ Uygulamayı emülatörde veya cihazda test ederken Fake GPS açmaya gerek kalmad
 5.  Alt kısımdaki **Kadıköy, Beşiktaş, Taksim, Levent** hızlı odak butonlarına basarak kameranın ilgili bölgelere yumuşak geçişini test edin.
 6.  Haritadaki herhangi bir pine veya renkli halkaya tıklayarak **küme içi detaylı cihaz ve risk loglarını** inceleyin.
 7.  Alttaki analitik çubuğuna tıklayarak açılan **Yönetici Isı & Analitik Paneli** üzerinden ısı yayılım çarpanı slider'ını ve KPI kartlarını test edin.
+
+### 4. 🔔 Geofence Bildirimleri ve Arka Plan Takibi Manuel Test Adımları
+1.  Uygulamanın **Ayarlar** sekmesine gidin.
+2.  **"GEOFENCE VE ARKA PLAN BİLDİRİMLERİ"** kartı altındaki **"Test Bildirimi Gönder"** seçeneğine dokunarak cihazınıza anında sistem push bildirimi geldiğini doğrulayın.
+3.  Aşağıdaki Demo panelinde yer alan **"Alana Giriş Simüle Et"** butonuna basın:
+    *   Cihazınıza *"📍 Hedef Alana Girdiniz! (Kadıköy Meydan sınırları içindesiniz. Güvenli check-in yapabilirsiniz.)"* push bildirimi düşecektir.
+    *   Harita ekranına döndüğünüzde yeşil *"📍 Hedef Kontrol Alanı İçindesiniz"* durum şeridinin yandığını ve **Check-in Yap** butonunun aktif olduğunu görün.
+4.  Ardından **"Alandan Çıkış Simüle Et"** butonuna basın:
+    *   Cihazınıza *"🚪 Hedef Alandan Çıktınız (Mesafe: 380m)"* push bildirimi düşecektir.
+5.  Ayarlar sekmesindeki **"Geofence Olay Geçmişi"** butonuna basarak gerçekleşen tüm giriş/çıkış olaylarının saat, mesafe ve hedef kayıtlarını detaylı listede görüntüleyin.
 
