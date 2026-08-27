@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/constants/turkey_provinces.dart';
 import '../../domain/entities/heatmap_cluster.dart';
 import '../providers/heatmap_providers.dart';
 
@@ -25,13 +26,11 @@ class _HeatmapRadarCanvasState extends State<HeatmapRadarCanvas>
     with SingleTickerProviderStateMixin {
   late AnimationController _animController;
 
-  // Istanbul coordinates bounding box
-  // Lat: 40.96 (South) to 41.13 (North)
-  // Lon: 28.95 (West) to 29.05 (East)
-  static const double _minLat = 40.9600;
-  static const double _maxLat = 41.1300;
-  static const double _minLon = 28.9500;
-  static const double _maxLon = 29.0600;
+  // Dynamic bounding box for 81 provinces and Turkey-wide radar
+  double _minLat = 40.9600;
+  double _maxLat = 41.1300;
+  double _minLon = 28.9500;
+  double _maxLon = 29.0600;
 
   // Center focus offset for smooth panning
   double _centerLat = 41.0200;
@@ -59,36 +58,58 @@ class _HeatmapRadarCanvasState extends State<HeatmapRadarCanvas>
 
   void _updateFocusForHub(String hub) {
     setState(() {
-      switch (hub) {
-        case 'Kadıköy':
-          _centerLat = 40.9905;
-          _centerLon = 29.0255;
-          _zoomScale = 1.8;
-          break;
-        case 'Beşiktaş':
-          _centerLat = 41.0428;
-          _centerLon = 29.0075;
-          _zoomScale = 1.8;
-          break;
-        case 'Taksim':
-          _centerLat = 41.0370;
-          _centerLon = 28.9850;
-          _zoomScale = 1.8;
-          break;
-        case 'Levent':
-          _centerLat = 41.0822;
-          _centerLon = 29.0125;
-          _zoomScale = 1.8;
-          break;
-        case 'Maslak':
-          _centerLat = 41.1060;
-          _centerLon = 29.0240;
-          _zoomScale = 1.8;
-          break;
-        default:
-          _centerLat = 41.0200;
-          _centerLon = 29.0050;
-          _zoomScale = 1.0;
+      final matches = TurkeyProvinces.search(hub);
+      if (matches.isNotEmpty) {
+        final p = matches.first;
+        _centerLat = p.latitude;
+        _centerLon = p.longitude;
+        _minLat = p.latitude - 0.12;
+        _maxLat = p.latitude + 0.12;
+        _minLon = p.longitude - 0.15;
+        _maxLon = p.longitude + 0.15;
+        _zoomScale = 1.8;
+      } else {
+        // Fallback for custom regional districts
+        switch (hub) {
+          case 'Kadıköy':
+            _centerLat = 40.9905;
+            _centerLon = 29.0255;
+            _minLat = 40.92; _maxLat = 41.06; _minLon = 28.95; _maxLon = 29.10;
+            _zoomScale = 1.8;
+            break;
+          case 'Beşiktaş':
+            _centerLat = 41.0428;
+            _centerLon = 29.0075;
+            _minLat = 40.98; _maxLat = 41.10; _minLon = 28.94; _maxLon = 29.08;
+            _zoomScale = 1.8;
+            break;
+          case 'Taksim':
+            _centerLat = 41.0370;
+            _centerLon = 28.9850;
+            _minLat = 40.97; _maxLat = 41.09; _minLon = 28.92; _maxLon = 29.06;
+            _zoomScale = 1.8;
+            break;
+          case 'Levent':
+            _centerLat = 41.0822;
+            _centerLon = 29.0125;
+            _minLat = 41.02; _maxLat = 41.14; _minLon = 28.95; _maxLon = 29.08;
+            _zoomScale = 1.8;
+            break;
+          case 'Maslak':
+            _centerLat = 41.1060;
+            _centerLon = 29.0240;
+            _minLat = 41.04; _maxLat = 41.16; _minLon = 28.96; _maxLon = 29.09;
+            _zoomScale = 1.8;
+            break;
+          default:
+            _centerLat = 39.0000;
+            _centerLon = 35.0000;
+            _minLat = 35.8000;
+            _maxLat = 42.2000;
+            _minLon = 25.5000;
+            _maxLon = 44.8000;
+            _zoomScale = 1.0;
+        }
       }
     });
   }
@@ -145,16 +166,18 @@ class _HeatmapRadarCanvasState extends State<HeatmapRadarCanvas>
                   }
                 }
               },
-              child: CustomPaint(
-                size: size,
-                painter: _HeatmapRadarPainter(
-                  clusters: widget.clusters,
-                  mode: widget.mode,
-                  pulseVal: _animController.value,
-                  centerLat: _centerLat,
-                  centerLon: _centerLon,
-                  zoomScale: _zoomScale,
-                  selectedHub: widget.selectedHub,
+              child: RepaintBoundary(
+                child: CustomPaint(
+                  size: size,
+                  painter: _HeatmapRadarPainter(
+                    clusters: widget.clusters,
+                    mode: widget.mode,
+                    pulseVal: _animController.value,
+                    centerLat: _centerLat,
+                    centerLon: _centerLon,
+                    zoomScale: _zoomScale,
+                    selectedHub: widget.selectedHub,
+                  ),
                 ),
               ),
             );

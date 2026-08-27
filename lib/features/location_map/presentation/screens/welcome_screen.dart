@@ -17,20 +17,19 @@ class WelcomeScreen extends ConsumerWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
 
               // Central Branding
               Column(
                 children: [
                   Container(
-                    width: 100,
-                    height: 100,
+                    width: 90,
+                    height: 90,
                     decoration: BoxDecoration(
                       color: AppTheme.primary.withAlpha(26),
                       shape: BoxShape.circle,
@@ -45,32 +44,34 @@ class WelcomeScreen extends ConsumerWidget {
                     ),
                     child: const Icon(
                       Icons.radar_rounded,
-                      size: 56,
+                      size: 50,
                       color: AppTheme.primary,
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
                   const Text(
                     "WAYPOINT",
                     style: TextStyle(
-                      fontSize: 32,
+                      fontSize: 30,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 4.0,
                       color: AppTheme.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   const Text(
                     "Güvenli Konum & Antispoofing Doğrulama",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       color: AppTheme.textSecondary,
                       letterSpacing: 0.5,
                     ),
                   ),
                 ],
               ),
+
+              const SizedBox(height: 24),
 
               // Interactive permission UI box
               Card(
@@ -85,6 +86,8 @@ class WelcomeScreen extends ConsumerWidget {
                 ),
               ),
 
+              const SizedBox(height: 24),
+
               // Feature Highlights & Call-to-action
               Column(
                 children: [
@@ -94,16 +97,16 @@ class WelcomeScreen extends ConsumerWidget {
                     subtitle:
                         "OS Mock sağlayıcıları, teleportasyon ve sensör tutarsızlık tespiti.",
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
                   _buildFeatureRow(
                     icon: Icons.my_location_rounded,
                     title: "Geofence Check-in",
                     subtitle:
                         "Belirlenen hedef noktalarında güvenli ve doğrulanmış check-in.",
                   ),
-                  const SizedBox(height: 20),
                 ],
               ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -130,12 +133,18 @@ class WelcomeScreen extends ConsumerWidget {
               ),
             ),
             SizedBox(width: 12),
-            Text("Konum İzin Durumu Kontrol Ediliyor..."),
+            Flexible(
+              child: Text(
+                "Konum İzin Durumu Kontrol Ediliyor...",
+                style: TextStyle(fontSize: 13),
+              ),
+            ),
           ],
         );
 
       case PermissionState.denied:
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Row(
               children: [
@@ -145,9 +154,11 @@ class WelcomeScreen extends ConsumerWidget {
                   size: 24,
                 ),
                 SizedBox(width: 12),
-                Text(
-                  "Konum İzni Gerekli",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                Expanded(
+                  child: Text(
+                    "Konum İzni Gerekli",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
                 ),
               ],
             ),
@@ -169,17 +180,20 @@ class WelcomeScreen extends ConsumerWidget {
 
       case PermissionState.deniedForever:
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Row(
               children: [
                 Icon(Icons.gpp_bad_rounded, color: AppTheme.spoofed, size: 24),
                 SizedBox(width: 12),
-                Text(
-                  "İzinler Kalıcı Olarak Devre Dışı",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: AppTheme.spoofed,
+                Expanded(
+                  child: Text(
+                    "İzinler Kalıcı Olarak Devre Dışı",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: AppTheme.spoofed,
+                    ),
                   ),
                 ),
               ],
@@ -206,6 +220,7 @@ class WelcomeScreen extends ConsumerWidget {
 
       case PermissionState.whileInUse:
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Row(
               children: [
@@ -215,12 +230,14 @@ class WelcomeScreen extends ConsumerWidget {
                   size: 24,
                 ),
                 SizedBox(width: 12),
-                Text(
-                  "Kullanım İzni Aktif",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: AppTheme.safe,
+                Expanded(
+                  child: Text(
+                    "Kullanım İzni Aktif",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: AppTheme.safe,
+                    ),
                   ),
                 ),
               ],
@@ -262,6 +279,7 @@ class WelcomeScreen extends ConsumerWidget {
 
       case PermissionState.always:
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Row(
               children: [
@@ -271,12 +289,14 @@ class WelcomeScreen extends ConsumerWidget {
                   size: 24,
                 ),
                 SizedBox(width: 12),
-                Text(
-                  "Tam Yetki Etkinleştirildi",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: AppTheme.primary,
+                Expanded(
+                  child: Text(
+                    "Tam Yetki Etkinleştirildi",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: AppTheme.primary,
+                    ),
                   ),
                 ),
               ],

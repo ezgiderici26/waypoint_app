@@ -65,6 +65,7 @@ class CheckInHistoryNotifier extends StateNotifier<List<CheckInRecord>> {
     required String deviceStatus,
     required String targetName,
     required bool isBlocked,
+    int? plateCode, // Türkiye plaka kodu (1-81), opsiyonel
   }) async {
     final record = CheckInRecord(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
@@ -77,6 +78,7 @@ class CheckInHistoryNotifier extends StateNotifier<List<CheckInRecord>> {
       targetName: targetName,
       isSynced: false,
       isBlocked: isBlocked,
+      plateCode: plateCode,
     );
 
     // 1. Encrypt and Save to local database (Hive)

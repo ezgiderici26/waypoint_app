@@ -266,6 +266,7 @@ class MockCheckInHistoryNotifier extends StateNotifier<List<CheckInRecord>>
     required String deviceStatus,
     required String targetName,
     required bool isBlocked,
+    int? plateCode,
   }) async {}
 
   @override

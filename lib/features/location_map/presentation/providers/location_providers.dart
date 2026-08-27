@@ -66,17 +66,26 @@ final permissionProvider =
       return PermissionNotifier();
     });
 
-// Provide Live Location Stream
-final locationStreamProvider = StreamProvider<LocationData>((ref) {
+// Custom simulated/overridden location state (for testing or instant province teleport)
+final simulatedUserLocationProvider = StateProvider<LocationData?>((ref) => null);
+
+// Provide Live Location Stream (with simulation override support)
+final locationStreamProvider = StreamProvider<LocationData>((ref) async* {
+  final simulatedLoc = ref.watch(simulatedUserLocationProvider);
+  if (simulatedLoc != null) {
+    yield simulatedLoc;
+    return;
+  }
+
   final repository = ref.watch(locationRepositoryProvider);
   final permission = ref.watch(permissionProvider);
 
   // Only stream location if permission is granted
   if (permission == PermissionState.whileInUse ||
       permission == PermissionState.always) {
-    return repository.getLocationStream();
+    yield* repository.getLocationStream();
   } else {
-    return const Stream.empty();
+    yield* const Stream.empty();
   }
 });
 
@@ -95,12 +104,12 @@ class TargetLocation {
   });
 }
 
-// Provide target geofence location (default: Kadıköy)
+// Provide target geofence location (default: 34 İstanbul)
 final targetLocationProvider = StateProvider<TargetLocation>((ref) {
   return const TargetLocation(
-    name: "Kadıköy Meydan",
-    latitude: 40.9905,
-    longitude: 29.0255,
+    name: "34 İstanbul (Taksim Meydanı)",
+    latitude: 41.0370,
+    longitude: 28.9850,
     radius: 200.0,
   );
 });

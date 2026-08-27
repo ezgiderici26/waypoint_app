@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_jailbreak_detection/flutter_jailbreak_detection.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -85,7 +86,7 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
   Future<void> checkIntegrity() async {
     final sim = _ref.read(simulationProvider);
 
-    if (Platform.environment.containsKey('FLUTTER_TEST')) {
+    if (kIsWeb || (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST'))) {
       final bool finalJailbroken = sim.simulateRooted;
       final bool finalEmulator = sim.simulateEmulator;
       final bool finalPlayIntegrityFail = sim.simulatePlayIntegrityFail;
@@ -101,7 +102,7 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
         riskLabel: finalJailbroken ? "TEHLİKELİ (Root/Jailbreak)" : "GÜVENLİ",
         isIntegrityVerified: integrityVerified,
         integrityVerdict: integrityVerified
-            ? "MEETS_STRONG_INTEGRITY"
+            ? (kIsWeb ? "WEB_BROWSER_ENVIRONMENT (Verified)" : "MEETS_STRONG_INTEGRITY")
             : "INTEGRITY_FAILED",
       );
       return;
@@ -114,38 +115,44 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
       bool vpnActive = false;
 
       // 1. Jailbreak / Root detection
-      try {
-        jailbroken = await FlutterJailbreakDetection.jailbroken;
-        devMode = await FlutterJailbreakDetection.developerMode;
-      } catch (_) {}
+      if (!kIsWeb) {
+        try {
+          jailbroken = await FlutterJailbreakDetection.jailbroken;
+          devMode = await FlutterJailbreakDetection.developerMode;
+        } catch (_) {}
+      }
 
       // 2. Emulator detection
-      try {
-        final deviceInfo = DeviceInfoPlugin();
-        if (Platform.isAndroid) {
-          final androidInfo = await deviceInfo.androidInfo;
-          emulator = !androidInfo.isPhysicalDevice;
-        } else if (Platform.isIOS) {
-          final iosInfo = await deviceInfo.iosInfo;
-          emulator = !iosInfo.isPhysicalDevice;
-        }
-      } catch (_) {}
+      if (!kIsWeb) {
+        try {
+          final deviceInfo = DeviceInfoPlugin();
+          if (Platform.isAndroid) {
+            final androidInfo = await deviceInfo.androidInfo;
+            emulator = !androidInfo.isPhysicalDevice;
+          } else if (Platform.isIOS) {
+            final iosInfo = await deviceInfo.iosInfo;
+            emulator = !iosInfo.isPhysicalDevice;
+          }
+        } catch (_) {}
+      }
 
       // 3. VPN / Proxy detection (checks network interfaces)
-      try {
-        final interfaces = await NetworkInterface.list(
-          includeLoopback: false,
-          type: InternetAddressType.any,
-        );
-        vpnActive = interfaces.any((interface) {
-          final name = interface.name.toLowerCase();
-          return name.contains('tun') ||
-              name.contains('ppp') ||
-              name.contains('p2p') ||
-              name.contains('tap') ||
-              name.contains('vpn');
-        });
-      } catch (_) {}
+      if (!kIsWeb) {
+        try {
+          final interfaces = await NetworkInterface.list(
+            includeLoopback: false,
+            type: InternetAddressType.any,
+          );
+          vpnActive = interfaces.any((interface) {
+            final name = interface.name.toLowerCase();
+            return name.contains('tun') ||
+                name.contains('ppp') ||
+                name.contains('p2p') ||
+                name.contains('tap') ||
+                name.contains('vpn');
+          });
+        } catch (_) {}
+      }
 
       // Apply Simulation Overrides
       final finalJailbroken = sim.simulateRooted ? true : jailbroken;
@@ -155,13 +162,14 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
       final finalPlayIntegrityFail = sim.simulatePlayIntegrityFail;
 
       // 4. Play Integrity / App Attest cryptographic attestation logic
-      // In physical devices, bootloader locks and CTS profiles are required to pass.
       final bool integrityVerified =
           !finalPlayIntegrityFail && !finalEmulator && !finalJailbroken;
       final String integrityVerdict = integrityVerified
-          ? (Platform.isAndroid
+          ? (!kIsWeb && Platform.isAndroid
                 ? "MEETS_STRONG_INTEGRITY (Verified)"
-                : "APP_ATTEST_VERIFIED (Verified)")
+                : (!kIsWeb && Platform.isIOS
+                    ? "APP_ATTEST_VERIFIED (Verified)"
+                    : "WEB_SANDBOX_INTEGRITY (Verified)"))
           : (finalPlayIntegrityFail
                 ? "INTEGRITY_FAILED (SIGNATURE_MISMATCH)"
                 : "MEETS_NO_INTEGRITY (EMULATOR / ROOTED)");

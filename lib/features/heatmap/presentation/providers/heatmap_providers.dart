@@ -397,6 +397,88 @@ class HeatmapNotifier extends StateNotifier<HeatmapState> {
         isSynced: true,
         isBlocked: false,
       ),
+
+      // 7. Ankara Kızılay Hub (06)
+      CheckInRecord(
+        id: 'seed-ank-1',
+        timestamp: now.subtract(const Duration(minutes: 45)).toIso8601String(),
+        latitude: 39.9334,
+        longitude: 32.8597,
+        accuracy: 3.5,
+        riskScore: 8,
+        deviceStatus: 'Rooted: false, Emulator: false, VPN: false',
+        targetName: 'Ankara Kızılay Meydanı',
+        isSynced: true,
+        isBlocked: false,
+      ),
+      CheckInRecord(
+        id: 'seed-ank-2',
+        timestamp: now.subtract(const Duration(hours: 2)).toIso8601String(),
+        latitude: 39.9338,
+        longitude: 32.8601,
+        accuracy: 4.0,
+        riskScore: 82,
+        deviceStatus: 'Rooted: true, Emulator: true (K1+K2)',
+        targetName: 'Ankara Kızılay Meydanı',
+        isSynced: true,
+        isBlocked: true,
+      ),
+
+      // 8. İzmir Konak Hub (35)
+      CheckInRecord(
+        id: 'seed-izm-1',
+        timestamp: now.subtract(const Duration(hours: 1, minutes: 10)).toIso8601String(),
+        latitude: 38.4192,
+        longitude: 27.1287,
+        accuracy: 2.8,
+        riskScore: 12,
+        deviceStatus: 'Rooted: false, Emulator: false, VPN: false',
+        targetName: 'İzmir Konak Saat Kulesi',
+        isSynced: true,
+        isBlocked: false,
+      ),
+
+      // 9. Bursa Heykel Hub (16)
+      CheckInRecord(
+        id: 'seed-brs-1',
+        timestamp: now.subtract(const Duration(hours: 4)).toIso8601String(),
+        latitude: 40.1885,
+        longitude: 29.0610,
+        accuracy: 3.2,
+        riskScore: 18,
+        deviceStatus: 'Rooted: false, Emulator: false, VPN: false',
+        targetName: 'Bursa Kent Meydanı',
+        isSynced: true,
+        isBlocked: false,
+      ),
+
+      // 10. Antalya Muratpaşa Hub (07)
+      CheckInRecord(
+        id: 'seed-ant-1',
+        timestamp: now.subtract(const Duration(hours: 5)).toIso8601String(),
+        latitude: 36.8969,
+        longitude: 30.7133,
+        accuracy: 4.8,
+        riskScore: 15,
+        deviceStatus: 'Rooted: false, Emulator: false, VPN: false',
+        targetName: 'Antalya Muratpaşa Meydanı',
+        isSynced: true,
+        isBlocked: false,
+      ),
+
+      // 11. Trabzon Meydan Hub (61)
+      CheckInRecord(
+        id: 'seed-tbz-1',
+        timestamp: now.subtract(const Duration(hours: 3)).toIso8601String(),
+        latitude: 41.0027,
+        longitude: 39.7168,
+        accuracy: 5.0,
+        riskScore: 22,
+        deviceStatus: 'Rooted: false, Emulator: false, VPN: false',
+        targetName: 'Trabzon Meydan Parkı',
+        isSynced: true,
+        isBlocked: false,
+      ),
     ];
 
     await ref.read(checkInHistoryProvider.notifier).addBulkRecords(demoRecords);

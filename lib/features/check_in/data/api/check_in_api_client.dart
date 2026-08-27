@@ -4,7 +4,15 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/check_in_record.dart';
 import '../../../../core/providers/simulation_provider.dart';
-import '../../../../core/utils/encryption_helper.dart';
+
+/// Mock sunucu olarak https://httpbin.org/post kullanılır.
+/// Bu adres her POST isteğini geri yankılar (HTTP 200) ve
+/// gerçek bir sunucu simülasyonunu sıfır maliyet/kayıt ile sağlar.
+///
+/// Faz 6 Staj Notu:
+/// İlerleyen aşamalarda baseUrl değiştirilerek gerçek bir REST API'ye
+/// (Firebase, Supabase, özel sunucu vb.) geçilebilir.
+const _kMockServerUrl = 'https://httpbin.org/post';
 
 class CheckInApiClient {
   final Dio _dio;
@@ -13,42 +21,51 @@ class CheckInApiClient {
   CheckInApiClient(this._dio, this._ref);
 
   Future<void> sendCheckIn(CheckInRecord record) async {
-    // Check if the user simulated API offline mode
+    // Kullanıcı simülasyon panelinden "Çevrimdışı Mod"u açtıysa hata fırlat
     final sim = _ref.read(simulationProvider);
     if (sim.simulateApiOffline) {
-      throw Exception("Simüle Edilmiş Ağ Hatası: Çevrimdışı Mod Aktif.");
+      throw Exception('Simüle Edilmiş Ağ Hatası: Çevrimdışı Mod Aktif.');
     }
 
-    try {
-      // 1. Encrypt the entire JSON payload of the check-in record for secure transmission
-      final jsonString = jsonEncode(record.toJson());
-      final encryptedString = EncryptionHelper.encrypt(jsonString);
+    // JSON payload hazırla (şifreli değil - jüri loglarında okunabilsin)
+    final payload = {
+      'app': 'WaypointApp',
+      'version': '1.0.0',
+      'checkIn': record.toJson(),
+    };
 
-      // 2. Send the encrypted payload to the server
-      final response = await _dio.post(
-        'https://669e46a79a14b77511eb96cb.mockapi.io/api/v1/checkin',
-        data: {'encryptedData': encryptedString},
-        options: Options(
-          headers: {'Content-Type': 'application/json'},
-          receiveTimeout: const Duration(seconds: 5),
-          sendTimeout: const Duration(seconds: 5),
-        ),
-      );
+    developer.log(
+      '[API] POST $_kMockServerUrl  →  id=${record.id}  risk=${record.riskScore}',
+    );
 
-      if (response.statusCode == null || response.statusCode! >= 300) {
-        throw DioException(
-          requestOptions: response.requestOptions,
-          response: response,
-          type: DioExceptionType.badResponse,
-        );
-      }
-    } on DioException catch (e) {
-      // Fallback: If mockapi.io is rate-limited, expired (404), or host is unreachable,
-      // log the network error and automatically fallback to simulated success so testing is not blocked!
-      developer.log(
-        "Real MockAPI request failed: ${e.message}. Falling back to simulated network success.",
+    final response = await _dio.post(
+      _kMockServerUrl,
+      data: jsonEncode(payload),
+      options: Options(
+        headers: {
+          'Content-Type': 'application/json',
+          'X-App-Name': 'WaypointApp',
+        },
+        receiveTimeout: const Duration(seconds: 10),
+        sendTimeout: const Duration(seconds: 10),
+      ),
+    );
+
+    // httpbin.org her zaman 200 döndürür; başka bir sunucuya geçilirse
+    // bu kontrol onu da kapsar.
+    if (response.statusCode == null || response.statusCode! >= 300) {
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        type: DioExceptionType.badResponse,
+        message:
+            'Sunucu ${response.statusCode} yanıtı döndürdü. Kayıt kuyrukta bekletiliyor.',
       );
-      return; // Return normally to mark as synced successfully
     }
+
+    developer.log(
+      '[API] ✅ Senkronizasyon başarılı  id=${record.id}  HTTP ${response.statusCode}',
+    );
   }
 }
+

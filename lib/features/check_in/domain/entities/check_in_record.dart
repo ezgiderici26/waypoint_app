@@ -10,6 +10,10 @@ class CheckInRecord {
   final bool isSynced;
   final bool isBlocked;
 
+  /// Türkiye plaka kodu (1-81). Seçilen ilin plakasına karşılık gelir.
+  /// Eski kayıtlarla geriye dönük uyumluluk için nullable tutulmuştur.
+  final int? plateCode;
+
   const CheckInRecord({
     required this.id,
     required this.timestamp,
@@ -21,6 +25,7 @@ class CheckInRecord {
     required this.targetName,
     required this.isSynced,
     required this.isBlocked,
+    this.plateCode, // nullable - eski kayıtlar null döndürür
   });
 
   Map<String, dynamic> toJson() {
@@ -35,6 +40,7 @@ class CheckInRecord {
       'targetName': targetName,
       'isSynced': isSynced,
       'isBlocked': isBlocked,
+      if (plateCode != null) 'plateCode': plateCode,
     };
   }
 
@@ -50,6 +56,8 @@ class CheckInRecord {
       targetName: json['targetName'] as String,
       isSynced: json['isSynced'] as bool,
       isBlocked: json['isBlocked'] as bool,
+      // Eski kayıtlarda 'plateCode' alanı yoksa null döner
+      plateCode: json['plateCode'] as int?,
     );
   }
 
@@ -64,6 +72,7 @@ class CheckInRecord {
     String? targetName,
     bool? isSynced,
     bool? isBlocked,
+    int? plateCode,
   }) {
     return CheckInRecord(
       id: id ?? this.id,
@@ -76,6 +85,8 @@ class CheckInRecord {
       targetName: targetName ?? this.targetName,
       isSynced: isSynced ?? this.isSynced,
       isBlocked: isBlocked ?? this.isBlocked,
+      plateCode: plateCode ?? this.plateCode,
     );
   }
 }
+

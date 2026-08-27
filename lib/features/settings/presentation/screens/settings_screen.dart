@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../location_map/presentation/providers/location_providers.dart';
+import '../../../location_map/presentation/providers/province_providers.dart';
 import '../../../location_map/presentation/providers/geofence_providers.dart';
+import '../../../location_map/presentation/widgets/city_selector_sheet.dart';
 import '../../../../core/services/notification_service.dart';
 import '../../../../core/providers/simulation_provider.dart';
 import '../providers/risk_tuning_providers.dart';
@@ -177,6 +179,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget build(BuildContext context) {
     final target = ref.watch(targetLocationProvider);
     final targetNotifier = ref.read(targetLocationProvider.notifier);
+    final selectedProvince = ref.watch(selectedProvinceProvider);
 
     // Watch Geofence Provider
     final geofenceState = ref.watch(geofenceProvider);
@@ -196,7 +199,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         children: [
           // Section: Target Preset
           const Text(
-            "HEDEF KONTROL NOKTASI",
+            "HEDEF KONTROL NOKTASI (81 İL)",
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
@@ -211,8 +214,36 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // 81 Province Selector Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () => CitySelectorSheet.show(context),
+                      icon: const Icon(
+                        Icons.travel_explore_rounded,
+                        size: 18,
+                        color: Colors.black,
+                      ),
+                      label: Text(
+                        "🇹🇷 81 İl Seçiciyi Aç (${selectedProvince.formattedPlate} - ${selectedProvince.name})",
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.black,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   const Text(
-                    "Hedef Bölge Preset Seçimi",
+                    "Hedef Bölge Hızlı Seçimi",
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
@@ -221,14 +252,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
-                    initialValue: target.name.contains("Mevcut")
-                        ? null
-                        : (target.name.isNotEmpty
-                              ? target.name
-                              : "Kadıköy Meydan"),
+                    initialValue: const [
+                      "Kadıköy Meydan",
+                      "Beşiktaş Sahil",
+                      "Taksim Metro",
+                      "İzmir Konak Meydanı",
+                      "İzmir Alsancak Kordon",
+                      "İzmir Bornova Meydan",
+                      "Ankara Kızılay",
+                    ].contains(target.name)
+                        ? target.name
+                        : null,
                     hint: Text(
                       target.name,
-                      style: const TextStyle(color: AppTheme.primary),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: AppTheme.primary, fontSize: 13),
                     ),
                     dropdownColor: AppTheme.surface,
                     decoration: const InputDecoration(
@@ -820,6 +859,171 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ],
             ),
           ),
+          const SizedBox(height: 24),
+
+          // Section: App & APK Build Info
+          const Text(
+            "UYGULAMA VE DERLEME BİLGİSİ (81 İL DESTEKLİ)",
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.5,
+              color: AppTheme.primary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primary.withAlpha(30),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AppTheme.primary.withAlpha(100)),
+                        ),
+                        child: const Icon(
+                          Icons.verified_rounded,
+                          color: AppTheme.primary,
+                          size: 22,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "WAYPOINT SAFE CHECK-IN",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1.1,
+                                color: AppTheme.textPrimary,
+                              ),
+                            ),
+                            Text(
+                              "Sürüm v1.0.0+1 • 27 Ağustos 2026 Derlemesi",
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: AppTheme.textSecondary.withAlpha(200),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  const Divider(height: 1, color: Color(0xFF2A3547)),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "🇹🇷 81 İl Akıllı GPS:",
+                        style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppTheme.safe.withAlpha(30),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: AppTheme.safe.withAlpha(100)),
+                        ),
+                        child: const Text(
+                          "AKTİF & ENTEGRE",
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.safe,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "📍 Seçili İl & Hedef:",
+                        style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                      ),
+                      Text(
+                        "${selectedProvince.formattedPlate} - ${selectedProvince.name}",
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "🗺️ Harita Motoru:",
+                        style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                      ),
+                      const Text(
+                        "OpenStreetMap & CartoDB (Sıfır Key)",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "🛰️ Taktik Radar Modu:",
+                        style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                      ),
+                      const Text(
+                        "Tamamen Çevrimdışı Aktif",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.safe,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "📦 APK Türü:",
+                        style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                      ),
+                      const Text(
+                        "Evrensel Release APK (İmzalı)",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.safe,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
         ],
       ),
     );

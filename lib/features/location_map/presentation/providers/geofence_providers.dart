@@ -75,12 +75,16 @@ class GeofenceNotifier extends StateNotifier<GeofenceState> {
   final Ref _ref;
 
   GeofenceNotifier(this._ref) : super(GeofenceState.initial()) {
-    // 1. Listen to target location changes
+    // 1. Listen to target location changes and re-evaluate immediately
     _ref.listen<TargetLocation>(targetLocationProvider, (_, nextTarget) {
       state = state.copyWith(
         targetName: nextTarget.name,
         targetRadius: nextTarget.radius,
       );
+      final currentLoc = _ref.read(locationStreamProvider).value;
+      if (currentLoc != null) {
+        _evaluateGeofence(currentLoc);
+      }
     });
 
     // 2. Listen to live/background location stream updates

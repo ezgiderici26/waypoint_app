@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart' as ll;
 import '../../../../core/theme/app_theme.dart';
+import '../../../location_map/presentation/widgets/city_selector_sheet.dart';
 import '../providers/heatmap_providers.dart';
 import '../widgets/heatmap_legend.dart';
 import '../widgets/heatmap_stats_sheet.dart';
@@ -16,50 +18,33 @@ class AdminHeatmapScreen extends ConsumerStatefulWidget {
 }
 
 class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
-  GoogleMapController? _mapController;
-  String _selectedHub = 'Kadıköy';
-  bool _useRadarCanvas =
-      true; // Default to tactical radar canvas so heatmap is 100% visible immediately!
+  final MapController _osmMapController = MapController();
+  String _selectedHub = '34 İstanbul';
+  bool _useRadarCanvas = false;
 
-  // Key Istanbul Hub Locations for Quick Navigation
-  static const Map<String, LatLng> _hubs = {
-    'Kadıköy': LatLng(40.9905, 29.0255),
-    'Beşiktaş': LatLng(41.0428, 29.0075),
-    'Taksim': LatLng(41.0370, 28.9850),
-    'Levent': LatLng(41.0822, 29.0125),
-    'Maslak': LatLng(41.1060, 29.0240),
+  // Key Turkey Provincial Hub Locations for Quick Navigation
+  static const Map<String, ll.LatLng> _hubs = {
+    '34 İstanbul': ll.LatLng(41.0082, 28.9784),
+    '06 Ankara': ll.LatLng(39.9334, 32.8597),
+    '35 İzmir': ll.LatLng(38.4192, 27.1287),
+    '16 Bursa': ll.LatLng(40.1885, 29.0610),
+    '07 Antalya': ll.LatLng(36.8969, 30.7133),
+    '01 Adana': ll.LatLng(37.0000, 35.3213),
+    '61 Trabzon': ll.LatLng(41.0027, 39.7168),
+    '27 Gaziantep': ll.LatLng(37.0662, 37.3833),
+    '42 Konya': ll.LatLng(37.8746, 32.4932),
+    '26 Eskişehir': ll.LatLng(39.7767, 30.5206),
   };
-
-  @override
-  void dispose() {
-    _mapController?.dispose();
-    super.dispose();
-  }
 
   void _navigateToLocation(
     String name,
-    LatLng target, {
+    ll.LatLng target, {
     double zoom = 15.2,
-  }) async {
+  }) {
     setState(() {
       _selectedHub = name;
     });
-    if (_mapController != null) {
-      try {
-        await _mapController!.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(target: target, zoom: zoom),
-          ),
-        );
-      } catch (e) {
-        debugPrint("Kamera hareketi hatası: $e");
-        await _mapController!.moveCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(target: target, zoom: zoom),
-          ),
-        );
-      }
-    }
+    _osmMapController.move(target, zoom);
   }
 
   void _openStatsSheet() {
@@ -76,8 +61,6 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
     final heatmapState = ref.watch(heatmapNotifierProvider);
     final heatmapNotifier = ref.read(heatmapNotifierProvider.notifier);
     final clusters = ref.watch(heatmapClustersProvider);
-    final circles = ref.watch(heatmapCirclesProvider);
-    final markers = ref.watch(heatmapMarkersProvider);
     final stats = ref.watch(heatmapStatsProvider);
 
     // Listen for cluster selection to open detail modal
@@ -102,7 +85,7 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
         actions: [
           IconButton(
             tooltip: _useRadarCanvas
-                ? "Google Harita Görünümüne Geç"
+                ? "Gerçek Sokak Haritasına Geç (CartoDB)"
                 : "Taktik Radar Görünümüne Geç",
             icon: Icon(
               _useRadarCanvas ? Icons.map_rounded : Icons.radar_rounded,
@@ -116,8 +99,8 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
                 SnackBar(
                   content: Text(
                     _useRadarCanvas
-                        ? "🎯 Taktik Radar & Canlı Isı Tuvali Modu Aktif!"
-                        : "🗺️ Google Maps Görünümü Aktif!",
+                        ? "🎯 Taktik Radar Modu Aktif (Çevrimdışı)"
+                        : "🌑 Gerçek Sokak Isı Haritası Aktif (CartoDB Dark)",
                   ),
                   backgroundColor: AppTheme.primary,
                   duration: const Duration(seconds: 1),
@@ -131,7 +114,7 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
             icon: const Icon(Icons.science_rounded, color: AppTheme.primary),
             onPressed: () async {
               await heatmapNotifier.seedHeatmapDemoData(ref);
-              _navigateToLocation('Kadıköy', _hubs['Kadıköy']!, zoom: 15.0);
+              _navigateToLocation('Kadıköy', _hubs['Kadıköy'] ?? const ll.LatLng(40.9905, 29.0255), zoom: 15.0);
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -154,7 +137,7 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
       ),
       body: Stack(
         children: [
-          // 1. Map View (Tactical Radar Canvas OR Google Maps)
+          // 1. Map View (Tactical Radar Canvas OR Real Street CartoDB Dark Map - Zero API Key)
           if (_useRadarCanvas)
             HeatmapRadarCanvas(
               clusters: clusters,
@@ -165,23 +148,92 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
               },
             )
           else
-            GoogleMap(
-              initialCameraPosition: const CameraPosition(
-                target: LatLng(40.9905, 29.0255),
-                zoom: 14.5,
+            FlutterMap(
+              mapController: _osmMapController,
+              options: const MapOptions(
+                initialCenter: ll.LatLng(40.9905, 29.0255),
+                initialZoom: 14.5,
+                minZoom: 3.0,
+                maxZoom: 19.0,
               ),
-              onMapCreated: (controller) {
-                _mapController = controller;
-                Future.delayed(const Duration(milliseconds: 250), () {
-                  _navigateToLocation('Kadıköy', _hubs['Kadıköy']!, zoom: 14.8);
-                });
-              },
-              circles: circles,
-              markers: markers,
-              myLocationEnabled: false,
-              myLocationButtonEnabled: false,
-              zoomControlsEnabled: false,
-              mapToolbarEnabled: false,
+              children: [
+                TileLayer(
+                  urlTemplate:
+                      'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+                  userAgentPackageName: 'com.example.waypoint_app',
+                  maxZoom: 19,
+                  maxNativeZoom: 16,
+                ),
+                TileLayer(
+                  urlTemplate:
+                      'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+                  userAgentPackageName: 'com.example.waypoint_app',
+                  maxZoom: 19,
+                  maxNativeZoom: 16,
+                ),
+                CircleLayer(
+                  circles: clusters.map((cluster) {
+                    final color = heatmapState.mode == HeatmapMode.risk
+                        ? (cluster.averageRiskScore < 35
+                            ? AppTheme.safe
+                            : (cluster.averageRiskScore < 70
+                                ? AppTheme.suspicious
+                                : AppTheme.spoofed))
+                        : AppTheme.primary;
+                    return CircleMarker(
+                      point: ll.LatLng(cluster.latitude, cluster.longitude),
+                      radius: (cluster.densityLevel * 60.0).clamp(40.0, 300.0),
+                      useRadiusInMeter: true,
+                      color: color.withAlpha(85),
+                      borderColor: color,
+                      borderStrokeWidth: 2.0,
+                    );
+                  }).toList(),
+                ),
+                MarkerLayer(
+                  markers: clusters.map((cluster) {
+                    final color = heatmapState.mode == HeatmapMode.risk
+                        ? (cluster.averageRiskScore < 35
+                            ? AppTheme.safe
+                            : (cluster.averageRiskScore < 70
+                                ? AppTheme.suspicious
+                                : AppTheme.spoofed))
+                        : AppTheme.primary;
+                    return Marker(
+                      point: ll.LatLng(cluster.latitude, cluster.longitude),
+                      width: 44,
+                      height: 44,
+                      child: GestureDetector(
+                        onTap: () => heatmapNotifier.selectCluster(cluster),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF0F172A).withAlpha(240),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: color, width: 2.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: color.withAlpha(90),
+                                blurRadius: 8,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Text(
+                              "${cluster.count}",
+                              style: TextStyle(
+                                color: color,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
             ),
 
           // 2. Top Control Panel (Mode Selector & Filters)
@@ -291,7 +343,7 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
             ),
           ),
 
-          // 3. Quick Hub Jump Buttons (Kadıköy, Beşiktaş, Taksim, Levent, Maslak)
+          // 3. Quick Hub Jump Buttons (81 İl Seçici + Büyükşehir Merkezleri)
           Positioned(
             left: 12,
             right: 12,
@@ -299,7 +351,63 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: _hubs.entries.map((entry) {
+                children: [
+                  // 81 Province Modal Trigger
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: InkWell(
+                      onTap: () => CitySelectorSheet.show(
+                        context,
+                        onProvinceSelected: (province) {
+                          _navigateToLocation(
+                            "${province.formattedPlate} ${province.name}",
+                            ll.LatLng(province.latitude, province.longitude),
+                            zoom: 14.5,
+                          );
+                        },
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF00D2FF), Color(0xFF9D4EDD)],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppTheme.primary.withAlpha(100),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.travel_explore_rounded,
+                              size: 14,
+                              color: Colors.black,
+                            ),
+                            SizedBox(width: 6),
+                            Text(
+                              "81 İl Seçici",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  ..._hubs.entries.map((entry) {
                   final bool isSelected = _selectedHub == entry.key;
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
@@ -361,10 +469,11 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
                       ),
                     ),
                   );
-                }).toList(),
-              ),
+                }),
+              ],
             ),
           ),
+        ),
 
           // 4. Bottom Analytics Quick Bar (Tappable Pill)
           Positioned(

@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart' as ll;
 import '../../../../core/theme/app_theme.dart';
 import '../providers/location_providers.dart';
+import '../providers/province_providers.dart';
 import '../providers/antispoofing_providers.dart';
+import '../widgets/city_selector_sheet.dart';
+import '../widgets/open_street_map_view.dart';
 import '../../../check_in/presentation/providers/check_in_providers.dart';
 import '../../../security/presentation/providers/security_providers.dart';
 import '../../../../core/services/biometric_service.dart';
+import '../../../../core/constants/turkey_provinces.dart';
 import '../providers/geofence_providers.dart';
 import '../../../heatmap/presentation/screens/admin_heatmap_screen.dart';
+import '../widgets/main_radar_canvas.dart';
 
 class MainMapScreen extends ConsumerStatefulWidget {
   const MainMapScreen({super.key});
@@ -18,89 +24,56 @@ class MainMapScreen extends ConsumerStatefulWidget {
 }
 
 class _MainMapScreenState extends ConsumerState<MainMapScreen> {
-  GoogleMapController? _mapController;
-
-  @override
-  void dispose() {
-    _mapController?.dispose();
-    super.dispose();
-  }
+  final MapController _osmController = MapController();
+  MapTileStyle _tileStyle = MapTileStyle.darkCyberpunk;
+  bool _useRadarCanvas = false;
 
   @override
   Widget build(BuildContext context) {
-    // 1. Watch live location stream, geofence, and distance
+    // 1. Watch live location stream, geofence, province, and distance
     final locationAsync = ref.watch(locationStreamProvider);
     final distanceToTarget = ref.watch(distanceToTargetProvider);
     final target = ref.watch(targetLocationProvider);
     final geofenceState = ref.watch(geofenceProvider);
+    final selectedProvince = ref.watch(selectedProvinceProvider);
 
     // 2. Watch real-time antispoofing and risk scoring
     final riskState = ref.watch(antispoofingProvider);
     final int riskScore = riskState.riskScore;
 
-    // 3. Listen to location changes to animate camera
+    // 3. Listen to location changes to animate camera and auto-detect nearest province
     ref.listen(locationStreamProvider, (previous, next) {
       next.whenData((location) {
-        if (_mapController != null) {
-          _mapController!.animateCamera(
-            CameraUpdate.newLatLng(
-              LatLng(location.latitude, location.longitude),
-            ),
+        _osmController.move(
+          ll.LatLng(location.latitude, location.longitude),
+          15.0,
+        );
+
+        // Auto-detect nearest province if using real GPS (not simulated)
+        // and the current selected province does not match the physically nearest province
+        final isSimulated = ref.read(simulatedUserLocationProvider) != null;
+        if (!isSimulated) {
+          final nearest = TurkeyProvinces.findNearest(
+            location.latitude,
+            location.longitude,
           );
+          final currentSelected = ref.read(selectedProvinceProvider);
+          if (currentSelected.plateCode != nearest.plateCode) {
+            ref.read(selectedProvinceProvider.notifier).autoDetectNearest(location);
+          }
         }
       });
     });
 
-    // Determine user position for map
-    final LatLng? userLatLng = locationAsync.maybeWhen(
-      data: (data) => LatLng(data.latitude, data.longitude),
-      orElse: () => null,
-    );
-
-    final LatLng targetLatLng = LatLng(target.latitude, target.longitude);
-
-    // 4. Configure Markers
-    final Set<Marker> markers = {
-      // Target Marker
-      Marker(
-        markerId: const MarkerId('target'),
-        position: targetLatLng,
-        infoWindow: InfoWindow(title: "Hedef: ${target.name}"),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan),
-      ),
-    };
-
-    if (userLatLng != null) {
-      markers.add(
-        Marker(
-          markerId: const MarkerId('user'),
-          position: userLatLng,
-          infoWindow: InfoWindow(
-            title: "Mevcut Konumunuz",
-            snippet: "Risk Skoru: $riskScore/100",
-          ),
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            riskScore < 35
-                ? BitmapDescriptor.hueGreen
-                : (riskScore < 70
-                      ? BitmapDescriptor.hueOrange
-                      : BitmapDescriptor.hueRed),
-          ),
-        ),
-      );
-    }
-
-    // 5. Configure Circles (Geofence Yarıçapı)
-    final Set<Circle> circles = {
-      Circle(
-        circleId: const CircleId('geofence'),
-        center: targetLatLng,
-        radius: target.radius,
-        strokeWidth: 2,
-        strokeColor: AppTheme.primary,
-        fillColor: AppTheme.primary.withAlpha(38),
-      ),
-    };
+    // 4. Listen to province changes to animate camera to the selected city center
+    ref.listen(selectedProvinceProvider, (previous, next) {
+      if (previous?.plateCode != next.plateCode) {
+        _osmController.move(
+          ll.LatLng(next.latitude, next.longitude),
+          15.0,
+        );
+      }
+    });
 
     // Determine if check-in is allowed (Must be within geofence and risk score must be SAFE < 35)
     final bool isInsideGeofence =
@@ -109,116 +82,261 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("WAYPOINT HARİTA"),
-        actions: [
-          IconButton(
-            tooltip: "Bulunduğum Konumu Hedef Geofence Yap",
-            icon: const Icon(
-              Icons.add_location_alt_rounded,
-              color: AppTheme.safe,
-            ),
-            onPressed: () {
-              final currentLoc = locationAsync.value;
-              if (currentLoc != null) {
-                ref
-                    .read(targetLocationProvider.notifier)
-                    .state = TargetLocation(
-                  name: "Mevcut Konumum (Canlı GPS)",
-                  latitude: currentLoc.latitude,
-                  longitude: currentLoc.longitude,
-                  radius: target.radius,
-                );
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      "📍 Bulunduğunuz yer (${currentLoc.latitude.toStringAsFixed(4)}, ${currentLoc.longitude.toStringAsFixed(4)}) hedef kontrol alanı yapıldı!",
-                    ),
-                    backgroundColor: AppTheme.safe,
-                  ),
-                );
-              }
-            },
-          ),
-          IconButton(
-            tooltip: "Yönetici Isı Haritası",
-            icon: const Icon(Icons.whatshot_rounded, color: AppTheme.primary),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const AdminHeatmapScreen()),
+        title: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => CitySelectorSheet.show(
+            context,
+            onProvinceSelected: (province) {
+              _osmController.move(
+                ll.LatLng(province.latitude, province.longitude),
+                15.0,
               );
             },
           ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppTheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppTheme.primary.withAlpha(120)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primary,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    selectedProvince.formattedPlate,
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    selectedProvince.name,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textPrimary,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 2),
+                const Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  size: 16,
+                  color: AppTheme.primary,
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          // 81 Province Selector
+          IconButton(
+            tooltip: "81 İl Seçici",
+            icon: const Icon(
+              Icons.travel_explore_rounded,
+              color: AppTheme.primary,
+            ),
+            onPressed: () => CitySelectorSheet.show(
+              context,
+              onProvinceSelected: (province) {
+                _osmController.move(
+                  ll.LatLng(province.latitude, province.longitude),
+                  15.0,
+                );
+              },
+            ),
+          ),
+
+          // Focus on My Location
           IconButton(
             tooltip: "Konumuma Odaklan",
-            icon: const Icon(Icons.my_location_rounded),
+            icon: const Icon(Icons.my_location_rounded, color: AppTheme.safe),
             onPressed: () {
-              if (userLatLng != null && _mapController != null) {
-                _mapController!.animateCamera(
-                  CameraUpdate.newCameraPosition(
-                    CameraPosition(target: userLatLng, zoom: 16),
-                  ),
+              final currentLoc = locationAsync.value;
+              if (currentLoc != null) {
+                _osmController.move(
+                  ll.LatLng(currentLoc.latitude, currentLoc.longitude),
+                  16.0,
                 );
               }
             },
+          ),
+
+          // Quick Action & Theme Popup Menu
+          PopupMenuButton<String>(
+            tooltip: "Menü & Harita Katmanları",
+            icon: const Icon(Icons.more_vert_rounded, color: AppTheme.primary),
+            color: AppTheme.surface,
+            onSelected: (val) {
+              if (val == 'target_here') {
+                final currentLoc = locationAsync.value;
+                if (currentLoc != null) {
+                  ref.read(targetLocationProvider.notifier).state = TargetLocation(
+                    name: "Mevcut Konumum (Canlı GPS)",
+                    latitude: currentLoc.latitude,
+                    longitude: currentLoc.longitude,
+                    radius: target.radius,
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        "📍 Konumunuz (${currentLoc.latitude.toStringAsFixed(4)}, ${currentLoc.longitude.toStringAsFixed(4)}) hedef yapıldı!",
+                      ),
+                      backgroundColor: AppTheme.safe,
+                    ),
+                  );
+                }
+                return;
+              }
+
+              if (val == 'heatmap') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AdminHeatmapScreen()),
+                );
+                return;
+              }
+
+              setState(() {
+                if (val == 'radar') {
+                  _useRadarCanvas = true;
+                } else if (val == 'dark') {
+                  _useRadarCanvas = false;
+                  _tileStyle = MapTileStyle.darkCyberpunk;
+                } else if (val == 'satellite') {
+                  _useRadarCanvas = false;
+                  _tileStyle = MapTileStyle.satelliteHybrid;
+                } else if (val == 'osm') {
+                  _useRadarCanvas = false;
+                  _tileStyle = MapTileStyle.streetOpenMap;
+                } else if (val == 'modern') {
+                  _useRadarCanvas = false;
+                  _tileStyle = MapTileStyle.streetModern;
+                }
+              });
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'dark',
+                child: Row(
+                  children: [
+                    Icon(Icons.dark_mode_rounded, color: Colors.cyanAccent, size: 18),
+                    SizedBox(width: 10),
+                    Text("🌑 Cyberpunk Dark", style: TextStyle(fontSize: 12, color: AppTheme.textPrimary)),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'satellite',
+                child: Row(
+                  children: [
+                    Icon(Icons.satellite_alt_rounded, color: Colors.lightGreenAccent, size: 18),
+                    SizedBox(width: 10),
+                    Text("🛰️ Gerçek Uydu Haritası", style: TextStyle(fontSize: 12, color: AppTheme.textPrimary)),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'osm',
+                child: Row(
+                  children: [
+                    Icon(Icons.map_rounded, color: Colors.amberAccent, size: 18),
+                    SizedBox(width: 10),
+                    Text("🗺️ Klasik Sokak Haritası", style: TextStyle(fontSize: 12, color: AppTheme.textPrimary)),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'modern',
+                child: Row(
+                  children: [
+                    Icon(Icons.location_city_rounded, color: Colors.orangeAccent, size: 18),
+                    SizedBox(width: 10),
+                    Text("🏙️ Modern Cadde Haritası", style: TextStyle(fontSize: 12, color: AppTheme.textPrimary)),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'radar',
+                child: Row(
+                  children: [
+                    Icon(Icons.radar_rounded, color: AppTheme.primary, size: 18),
+                    SizedBox(width: 10),
+                    Text("📡 Taktik Radar (Çevrimdışı)", style: TextStyle(fontSize: 12, color: AppTheme.textPrimary)),
+                  ],
+                ),
+              ),
+              const PopupMenuDivider(),
+              const PopupMenuItem(
+                value: 'target_here',
+                child: Row(
+                  children: [
+                    Icon(Icons.add_location_alt_rounded, color: AppTheme.safe, size: 18),
+                    SizedBox(width: 10),
+                    Text("📍 Burayı Hedef Geofence Yap", style: TextStyle(fontSize: 12, color: AppTheme.textPrimary)),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'heatmap',
+                child: Row(
+                  children: [
+                    Icon(Icons.whatshot_rounded, color: Colors.deepOrangeAccent, size: 18),
+                    SizedBox(width: 10),
+                    Text("📊 Yönetici Isı Haritası", style: TextStyle(fontSize: 12, color: AppTheme.textPrimary)),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
       body: Stack(
         children: [
-          // 1. Google Maps View
-          locationAsync.when(
-            data: (_) => GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: userLatLng ?? targetLatLng,
-                zoom: 15,
-              ),
-              onMapCreated: (controller) {
-                _mapController = controller;
-              },
-              markers: markers,
-              circles: circles,
-              myLocationEnabled: false,
-              myLocationButtonEnabled: false,
-              zoomControlsEnabled: false,
-              mapToolbarEnabled: false,
-            ),
-            error: (err, stack) => Container(
-              color: const Color(0xFF0F172A),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.error_outline_rounded,
-                      size: 64,
-                      color: AppTheme.spoofed,
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      "Bağlantı Hatası",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 32),
-                      child: Text(
-                        err.toString(),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: AppTheme.textSecondary),
-                      ),
-                    ),
-                  ],
+          // 1. Real Street/City Map View (CartoDB Dark / OpenStreetMap - Zero API Key) OR Tactical Radar
+          _useRadarCanvas
+              ? MainRadarCanvas(
+                  userLocation: locationAsync.value,
+                  targetLocation: target,
+                  selectedProvince: selectedProvince,
+                  riskScore: riskScore,
+                  isInsideGeofence: isInsideGeofence,
+                  distanceToTarget: distanceToTarget,
+                  onOpenCitySelector: () => CitySelectorSheet.show(
+                    context,
+                    onProvinceSelected: (province) {
+                      _osmController.move(
+                        ll.LatLng(province.latitude, province.longitude),
+                        15.0,
+                      );
+                    },
+                  ),
+                )
+              : OpenStreetMapWidget(
+                  userLocation: locationAsync.value,
+                  targetLocation: target,
+                  selectedProvince: selectedProvince,
+                  riskScore: riskScore,
+                  isInsideGeofence: isInsideGeofence,
+                  distanceToTarget: distanceToTarget,
+                  mapController: _osmController,
+                  tileStyle: _tileStyle,
                 ),
-              ),
-            ),
-            loading: () => Container(
-              color: const Color(0xFF0F172A),
-              child: const Center(
-                child: CircularProgressIndicator(color: AppTheme.primary),
-              ),
-            ),
-          ),
 
           // 2. Top Info Overlay (Risk Status Chip)
           Positioned(
@@ -265,6 +383,223 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                   ],
                 ),
 
+                // 81 Province Quick Selector Card
+                const SizedBox(height: 8),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(14),
+                    onTap: () => CitySelectorSheet.show(
+                      context,
+                      onProvinceSelected: (province) {
+                        _osmController.move(
+                          ll.LatLng(
+                            province.latitude,
+                            province.longitude,
+                          ),
+                          15.0,
+                        );
+                      },
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppTheme.surface.withAlpha(240),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: AppTheme.primary.withAlpha(140),
+                          width: 1.2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withAlpha(120),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primary,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              selectedProvince.formattedPlate,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      selectedProvince.name,
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppTheme.textPrimary,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 5,
+                                        vertical: 1,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF1E293B),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        selectedProvince.region,
+                                        style: const TextStyle(
+                                          fontSize: 9,
+                                          color: AppTheme.textSecondary,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Text(
+                                  "Hedef: ${selectedProvince.defaultCheckpointName} (200m) • Değiştir ▼",
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: AppTheme.primary.withAlpha(220),
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(
+                            Icons.tune_rounded,
+                            color: AppTheme.primary,
+                            size: 18,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Quick Province Teleport & Real GPS Toggle Buttons
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Row(
+                    children: [
+                      // Direct Button: "📍 [İl Adı]'na Işınlan / Hedefe Gir"
+                      Expanded(
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(10),
+                          onTap: () {
+                            ref
+                                .read(selectedProvinceProvider.notifier)
+                                .selectProvince(selectedProvince, moveUserToProvince: true);
+                            _osmController.move(
+                              ll.LatLng(selectedProvince.latitude, selectedProvince.longitude),
+                              16.5,
+                            );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "📍 Konumunuz ${selectedProvince.name} (${selectedProvince.defaultCheckpointName}) merkezine alındı! Check-in aktif.",
+                                ),
+                                backgroundColor: AppTheme.safe,
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                            decoration: BoxDecoration(
+                              color: isInsideGeofence
+                                  ? AppTheme.safe.withAlpha(45)
+                                  : AppTheme.primary.withAlpha(35),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: isInsideGeofence ? AppTheme.safe : AppTheme.primary,
+                                width: 1.2,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  isInsideGeofence
+                                      ? Icons.check_circle_rounded
+                                      : Icons.gps_fixed_rounded,
+                                  color: isInsideGeofence ? AppTheme.safe : AppTheme.primary,
+                                  size: 14,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  isInsideGeofence
+                                      ? "📍 ${selectedProvince.name}'desiniz (Check-in Açık)"
+                                      : "Konumumu ${selectedProvince.name}'ye Al",
+                                  style: TextStyle(
+                                    color: isInsideGeofence ? AppTheme.safe : AppTheme.primary,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      // Reset to Hardware GPS Sensor
+                      InkWell(
+                        borderRadius: BorderRadius.circular(10),
+                        onTap: () {
+                          ref.read(selectedProvinceProvider.notifier).useRealGps();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("📡 Cihazın canlı GPS sensörüne dönüldü."),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1E293B),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: const Color(0xFF334155)),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.sensors_rounded, color: AppTheme.textSecondary, size: 14),
+                              SizedBox(width: 4),
+                              Text(
+                                "Gerçek GPS",
+                                style: TextStyle(color: AppTheme.textSecondary, fontSize: 11),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
                 // Anomaly Warning Banners
                 if (riskState.isOsMocked) ...[
                   const SizedBox(height: 10),
@@ -305,7 +640,75 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
             ),
           ),
 
-          // 3. Bottom HUD Panel
+          // 3. Floating Quick Action Controls (Konumuma Git & Hedefe Git)
+          Positioned(
+            bottom: 225,
+            right: 16,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                // Focus on Target Geofence Button
+                FloatingActionButton.small(
+                  heroTag: "fab_target",
+                  backgroundColor: const Color(0xFF0F172A),
+                  foregroundColor: AppTheme.primary,
+                  elevation: 6,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: AppTheme.primary, width: 1.5),
+                  ),
+                  tooltip: "Hedef Geofence Noktasına Git",
+                  onPressed: () {
+                    _osmController.move(
+                      ll.LatLng(target.latitude, target.longitude),
+                      16.0,
+                    );
+                  },
+                  child: const Icon(Icons.flag_rounded, size: 20),
+                ),
+                const SizedBox(height: 10),
+                // Focus on User Live GPS Location Button
+                FloatingActionButton.extended(
+                  heroTag: "fab_my_loc",
+                  backgroundColor: AppTheme.primary,
+                  foregroundColor: Colors.black,
+                  elevation: 10,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  tooltip: "Canlı GPS Konumuma Odaklan",
+                  icon: const Icon(Icons.my_location_rounded, size: 20),
+                  label: const Text(
+                    "Konumuma Git",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 13,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                  onPressed: () {
+                    final currentLoc = locationAsync.value;
+                    if (currentLoc != null) {
+                      _osmController.move(
+                        ll.LatLng(currentLoc.latitude, currentLoc.longitude),
+                        16.5,
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("📡 GPS konumu alınıyor, lütfen bekleyin..."),
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+
+          // 4. Bottom HUD Panel
           Positioned(
             bottom: 16,
             left: 16,
@@ -476,6 +879,7 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                                             deviceStatus: devStatus,
                                             targetName: target.name,
                                             isBlocked: !isSafe,
+                                            plateCode: selectedProvince.plateCode,
                                           );
 
                                       if (context.mounted) {

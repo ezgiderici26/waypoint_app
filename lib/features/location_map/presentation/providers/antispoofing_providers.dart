@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:flutter_jailbreak_detection/flutter_jailbreak_detection.dart';
@@ -136,7 +137,7 @@ class AntispoofingNotifier extends StateNotifier<RiskState> {
   }
 
   void _initSensors() {
-    if (Platform.environment.containsKey('FLUTTER_TEST')) {
+    if (kIsWeb || (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST'))) {
       return;
     }
 
@@ -154,7 +155,7 @@ class AntispoofingNotifier extends StateNotifier<RiskState> {
   }
 
   Future<void> _checkDevMode() async {
-    if (Platform.environment.containsKey('FLUTTER_TEST')) {
+    if (kIsWeb || (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST'))) {
       return;
     }
     try {

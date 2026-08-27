@@ -13,7 +13,7 @@ class RiskTuningNotifier extends StateNotifier<RiskTuningConfig> {
   }
 
   Future<void> _loadFromStorage() async {
-    if (Platform.environment.containsKey('FLUTTER_TEST')) {
+    if (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST')) {
       return;
     }
     try {
@@ -31,7 +31,7 @@ class RiskTuningNotifier extends StateNotifier<RiskTuningConfig> {
   }
 
   Future<void> saveToStorage() async {
-    if (Platform.environment.containsKey('FLUTTER_TEST')) {
+    if (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST')) {
       return;
     }
     try {
