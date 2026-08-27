@@ -67,7 +67,9 @@ final permissionProvider =
     });
 
 // Custom simulated/overridden location state (for testing or instant province teleport)
-final simulatedUserLocationProvider = StateProvider<LocationData?>((ref) => null);
+final simulatedUserLocationProvider = StateProvider<LocationData?>(
+  (ref) => null,
+);
 
 // Provide Live Location Stream (with simulation override support)
 final locationStreamProvider = StreamProvider<LocationData>((ref) async* {

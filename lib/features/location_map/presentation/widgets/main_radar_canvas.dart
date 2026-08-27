@@ -213,7 +213,10 @@ class _MainRadarCanvasState extends State<MainRadarCanvas>
               top: 135,
               left: 16,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: AppTheme.suspicious.withAlpha(35),
                   borderRadius: BorderRadius.circular(8),
@@ -336,15 +339,38 @@ class _MainRadarPainter extends CustomPainter {
     }
 
     // Cardinal Labels (KUZEY, DOĞU, GÜNEY, BATI)
-    _drawText(canvas, "K", Offset(center.dx, center.dy - maxRadius - 14), AppTheme.primary);
-    _drawText(canvas, "G", Offset(center.dx, center.dy + maxRadius + 4), AppTheme.textSecondary);
-    _drawText(canvas, "D", Offset(center.dx + maxRadius + 10, center.dy - 6), AppTheme.textSecondary);
-    _drawText(canvas, "B", Offset(center.dx - maxRadius - 18, center.dy - 6), AppTheme.textSecondary);
+    _drawText(
+      canvas,
+      "K",
+      Offset(center.dx, center.dy - maxRadius - 14),
+      AppTheme.primary,
+    );
+    _drawText(
+      canvas,
+      "G",
+      Offset(center.dx, center.dy + maxRadius + 4),
+      AppTheme.textSecondary,
+    );
+    _drawText(
+      canvas,
+      "D",
+      Offset(center.dx + maxRadius + 10, center.dy - 6),
+      AppTheme.textSecondary,
+    );
+    _drawText(
+      canvas,
+      "B",
+      Offset(center.dx - maxRadius - 18, center.dy - 6),
+      AppTheme.textSecondary,
+    );
 
     // 2. Rotating Radar Sweep Effect
     final sweepPaint = Paint()
       ..shader = SweepGradient(
-        center: FractionalOffset(center.dx / size.width, center.dy / size.height),
+        center: FractionalOffset(
+          center.dx / size.width,
+          center.dy / size.height,
+        ),
         startAngle: 0.0,
         endAngle: pi / 2,
         colors: [
@@ -414,7 +440,8 @@ class _MainRadarPainter extends CustomPainter {
 
       // Connect User and Target with Vector Line
       final linePaint = Paint()
-        ..color = (isInsideGeofence ? AppTheme.safe : AppTheme.secondary).withAlpha(160)
+        ..color = (isInsideGeofence ? AppTheme.safe : AppTheme.secondary)
+            .withAlpha(160)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.5
         ..strokeCap = StrokeCap.round;
@@ -539,7 +566,10 @@ class _MainRadarPainter extends CustomPainter {
 
     textPainter.paint(
       canvas,
-      Offset(position.dx - textPainter.width / 2, position.dy - textPainter.height / 2),
+      Offset(
+        position.dx - textPainter.width / 2,
+        position.dy - textPainter.height / 2,
+      ),
     );
   }
 

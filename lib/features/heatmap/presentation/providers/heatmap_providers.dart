@@ -427,7 +427,9 @@ class HeatmapNotifier extends StateNotifier<HeatmapState> {
       // 8. İzmir Konak Hub (35)
       CheckInRecord(
         id: 'seed-izm-1',
-        timestamp: now.subtract(const Duration(hours: 1, minutes: 10)).toIso8601String(),
+        timestamp: now
+            .subtract(const Duration(hours: 1, minutes: 10))
+            .toIso8601String(),
         latitude: 38.4192,
         longitude: 27.1287,
         accuracy: 2.8,

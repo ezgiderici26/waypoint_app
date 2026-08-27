@@ -17,22 +17,24 @@ class HistoryScreen extends ConsumerWidget {
   String _buildCsv(List<CheckInRecord> logs) {
     final header =
         'id,timestamp,plateCode,targetName,latitude,longitude,accuracy,riskScore,deviceStatus,isSynced,isBlocked';
-    final rows = logs.map((r) {
-      String esc(String v) => v.contains(',') ? '"$v"' : v;
-      return [
-        r.id,
-        r.timestamp,
-        r.plateCode?.toString() ?? '',
-        esc(r.targetName),
-        r.latitude.toStringAsFixed(7),
-        r.longitude.toStringAsFixed(7),
-        r.accuracy.toStringAsFixed(2),
-        r.riskScore.toString(),
-        esc(r.deviceStatus),
-        r.isSynced ? '1' : '0',
-        r.isBlocked ? '1' : '0',
-      ].join(',');
-    }).join('\n');
+    final rows = logs
+        .map((r) {
+          String esc(String v) => v.contains(',') ? '"$v"' : v;
+          return [
+            r.id,
+            r.timestamp,
+            r.plateCode?.toString() ?? '',
+            esc(r.targetName),
+            r.latitude.toStringAsFixed(7),
+            r.longitude.toStringAsFixed(7),
+            r.accuracy.toStringAsFixed(2),
+            r.riskScore.toString(),
+            esc(r.deviceStatus),
+            r.isSynced ? '1' : '0',
+            r.isBlocked ? '1' : '0',
+          ].join(',');
+        })
+        .join('\n');
     return '$header\n$rows';
   }
 
@@ -53,7 +55,9 @@ class HistoryScreen extends ConsumerWidget {
   // Dışa Aktarma Modal Sheet
   // ──────────────────────────────────────────────────────────
   void _showExportSheet(BuildContext context, List<CheckInRecord> logs) {
-    final safeCount = logs.where((r) => !r.isBlocked && r.riskScore < 35).length;
+    final safeCount = logs
+        .where((r) => !r.isBlocked && r.riskScore < 35)
+        .length;
     final blockedCount = logs.where((r) => r.isBlocked).length;
     final syncedCount = logs.where((r) => r.isSynced).length;
     final avgRisk = logs.isEmpty
@@ -109,17 +113,23 @@ class HistoryScreen extends ConsumerWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFF0F172A),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: AppTheme.primary.withAlpha(60),
-                ),
+                border: Border.all(color: AppTheme.primary.withAlpha(60)),
               ),
               child: Column(
                 children: [
-                  _StatRow('Toplam Kayıt', '${logs.length}', AppTheme.textPrimary),
+                  _StatRow(
+                    'Toplam Kayıt',
+                    '${logs.length}',
+                    AppTheme.textPrimary,
+                  ),
                   _StatRow('Güvenli Check-in', '$safeCount', AppTheme.safe),
                   _StatRow('Engellenen', '$blockedCount', AppTheme.spoofed),
                   _StatRow('Senkronize', '$syncedCount', AppTheme.primary),
-                  _StatRow('Ort. Risk Skoru', avgRisk.toStringAsFixed(1), AppTheme.suspicious),
+                  _StatRow(
+                    'Ort. Risk Skoru',
+                    avgRisk.toStringAsFixed(1),
+                    AppTheme.suspicious,
+                  ),
                 ],
               ),
             ),
@@ -378,7 +388,9 @@ class HistoryScreen extends ConsumerWidget {
                                         color: AppTheme.primary.withAlpha(28),
                                         borderRadius: BorderRadius.circular(6),
                                         border: Border.all(
-                                          color: AppTheme.primary.withAlpha(120),
+                                          color: AppTheme.primary.withAlpha(
+                                            120,
+                                          ),
                                           width: 0.8,
                                         ),
                                       ),
@@ -531,10 +543,7 @@ class _StatRow extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 13,
-              color: AppTheme.textSecondary,
-            ),
+            style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary),
           ),
           Text(
             value,
@@ -614,11 +623,7 @@ class _ExportButton extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(
-              Icons.copy_rounded,
-              color: color.withAlpha(150),
-              size: 18,
-            ),
+            Icon(Icons.copy_rounded, color: color.withAlpha(150), size: 18),
           ],
         ),
       ),

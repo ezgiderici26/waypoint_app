@@ -86,7 +86,8 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
   Future<void> checkIntegrity() async {
     final sim = _ref.read(simulationProvider);
 
-    if (kIsWeb || (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST'))) {
+    if (kIsWeb ||
+        (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST'))) {
       final bool finalJailbroken = sim.simulateRooted;
       final bool finalEmulator = sim.simulateEmulator;
       final bool finalPlayIntegrityFail = sim.simulatePlayIntegrityFail;
@@ -102,7 +103,9 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
         riskLabel: finalJailbroken ? "TEHLİKELİ (Root/Jailbreak)" : "GÜVENLİ",
         isIntegrityVerified: integrityVerified,
         integrityVerdict: integrityVerified
-            ? (kIsWeb ? "WEB_BROWSER_ENVIRONMENT (Verified)" : "MEETS_STRONG_INTEGRITY")
+            ? (kIsWeb
+                  ? "WEB_BROWSER_ENVIRONMENT (Verified)"
+                  : "MEETS_STRONG_INTEGRITY")
             : "INTEGRITY_FAILED",
       );
       return;
@@ -168,8 +171,8 @@ class SecurityNotifier extends StateNotifier<SecurityState> {
           ? (!kIsWeb && Platform.isAndroid
                 ? "MEETS_STRONG_INTEGRITY (Verified)"
                 : (!kIsWeb && Platform.isIOS
-                    ? "APP_ATTEST_VERIFIED (Verified)"
-                    : "WEB_SANDBOX_INTEGRITY (Verified)"))
+                      ? "APP_ATTEST_VERIFIED (Verified)"
+                      : "WEB_SANDBOX_INTEGRITY (Verified)"))
           : (finalPlayIntegrityFail
                 ? "INTEGRITY_FAILED (SIGNATURE_MISMATCH)"
                 : "MEETS_NO_INTEGRITY (EMULATOR / ROOTED)");

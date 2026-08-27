@@ -137,7 +137,8 @@ class AntispoofingNotifier extends StateNotifier<RiskState> {
   }
 
   void _initSensors() {
-    if (kIsWeb || (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST'))) {
+    if (kIsWeb ||
+        (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST'))) {
       return;
     }
 
@@ -155,7 +156,8 @@ class AntispoofingNotifier extends StateNotifier<RiskState> {
   }
 
   Future<void> _checkDevMode() async {
-    if (kIsWeb || (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST'))) {
+    if (kIsWeb ||
+        (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST'))) {
       return;
     }
     try {

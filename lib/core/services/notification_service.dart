@@ -39,7 +39,8 @@ class NotificationService {
   Future<void> initialize() async {
     if (_isInitialized) return;
 
-    if (kIsWeb || (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST'))) {
+    if (kIsWeb ||
+        (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST'))) {
       _isInitialized = true;
       return;
     }
@@ -111,7 +112,8 @@ class NotificationService {
       ),
     );
 
-    if (kIsWeb || (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST'))) {
+    if (kIsWeb ||
+        (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST'))) {
       return;
     }
 

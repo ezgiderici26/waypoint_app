@@ -59,7 +59,9 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
           );
           final currentSelected = ref.read(selectedProvinceProvider);
           if (currentSelected.plateCode != nearest.plateCode) {
-            ref.read(selectedProvinceProvider.notifier).autoDetectNearest(location);
+            ref
+                .read(selectedProvinceProvider.notifier)
+                .autoDetectNearest(location);
           }
         }
       });
@@ -68,10 +70,7 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
     // 4. Listen to province changes to animate camera to the selected city center
     ref.listen(selectedProvinceProvider, (previous, next) {
       if (previous?.plateCode != next.plateCode) {
-        _osmController.move(
-          ll.LatLng(next.latitude, next.longitude),
-          15.0,
-        );
+        _osmController.move(ll.LatLng(next.latitude, next.longitude), 15.0);
       }
     });
 
@@ -186,7 +185,9 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
               if (val == 'target_here') {
                 final currentLoc = locationAsync.value;
                 if (currentLoc != null) {
-                  ref.read(targetLocationProvider.notifier).state = TargetLocation(
+                  ref
+                      .read(targetLocationProvider.notifier)
+                      .state = TargetLocation(
                     name: "Mevcut Konumum (Canlı GPS)",
                     latitude: currentLoc.latitude,
                     longitude: currentLoc.longitude,
@@ -235,9 +236,19 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                 value: 'dark',
                 child: Row(
                   children: [
-                    Icon(Icons.dark_mode_rounded, color: Colors.cyanAccent, size: 18),
+                    Icon(
+                      Icons.dark_mode_rounded,
+                      color: Colors.cyanAccent,
+                      size: 18,
+                    ),
                     SizedBox(width: 10),
-                    Text("🌑 Cyberpunk Dark", style: TextStyle(fontSize: 12, color: AppTheme.textPrimary)),
+                    Text(
+                      "🌑 Cyberpunk Dark",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -245,9 +256,19 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                 value: 'satellite',
                 child: Row(
                   children: [
-                    Icon(Icons.satellite_alt_rounded, color: Colors.lightGreenAccent, size: 18),
+                    Icon(
+                      Icons.satellite_alt_rounded,
+                      color: Colors.lightGreenAccent,
+                      size: 18,
+                    ),
                     SizedBox(width: 10),
-                    Text("🛰️ Gerçek Uydu Haritası", style: TextStyle(fontSize: 12, color: AppTheme.textPrimary)),
+                    Text(
+                      "🛰️ Gerçek Uydu Haritası",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -255,9 +276,19 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                 value: 'osm',
                 child: Row(
                   children: [
-                    Icon(Icons.map_rounded, color: Colors.amberAccent, size: 18),
+                    Icon(
+                      Icons.map_rounded,
+                      color: Colors.amberAccent,
+                      size: 18,
+                    ),
                     SizedBox(width: 10),
-                    Text("🗺️ Klasik Sokak Haritası", style: TextStyle(fontSize: 12, color: AppTheme.textPrimary)),
+                    Text(
+                      "🗺️ Klasik Sokak Haritası",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -265,9 +296,19 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                 value: 'modern',
                 child: Row(
                   children: [
-                    Icon(Icons.location_city_rounded, color: Colors.orangeAccent, size: 18),
+                    Icon(
+                      Icons.location_city_rounded,
+                      color: Colors.orangeAccent,
+                      size: 18,
+                    ),
                     SizedBox(width: 10),
-                    Text("🏙️ Modern Cadde Haritası", style: TextStyle(fontSize: 12, color: AppTheme.textPrimary)),
+                    Text(
+                      "🏙️ Modern Cadde Haritası",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -275,9 +316,19 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                 value: 'radar',
                 child: Row(
                   children: [
-                    Icon(Icons.radar_rounded, color: AppTheme.primary, size: 18),
+                    Icon(
+                      Icons.radar_rounded,
+                      color: AppTheme.primary,
+                      size: 18,
+                    ),
                     SizedBox(width: 10),
-                    Text("📡 Taktik Radar (Çevrimdışı)", style: TextStyle(fontSize: 12, color: AppTheme.textPrimary)),
+                    Text(
+                      "📡 Taktik Radar (Çevrimdışı)",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -286,9 +337,19 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                 value: 'target_here',
                 child: Row(
                   children: [
-                    Icon(Icons.add_location_alt_rounded, color: AppTheme.safe, size: 18),
+                    Icon(
+                      Icons.add_location_alt_rounded,
+                      color: AppTheme.safe,
+                      size: 18,
+                    ),
                     SizedBox(width: 10),
-                    Text("📍 Burayı Hedef Geofence Yap", style: TextStyle(fontSize: 12, color: AppTheme.textPrimary)),
+                    Text(
+                      "📍 Burayı Hedef Geofence Yap",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -296,9 +357,19 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                 value: 'heatmap',
                 child: Row(
                   children: [
-                    Icon(Icons.whatshot_rounded, color: Colors.deepOrangeAccent, size: 18),
+                    Icon(
+                      Icons.whatshot_rounded,
+                      color: Colors.deepOrangeAccent,
+                      size: 18,
+                    ),
                     SizedBox(width: 10),
-                    Text("📊 Yönetici Isı Haritası", style: TextStyle(fontSize: 12, color: AppTheme.textPrimary)),
+                    Text(
+                      "📊 Yönetici Isı Haritası",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -393,10 +464,7 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                       context,
                       onProvinceSelected: (province) {
                         _osmController.move(
-                          ll.LatLng(
-                            province.latitude,
-                            province.longitude,
-                          ),
+                          ll.LatLng(province.latitude, province.longitude),
                           15.0,
                         );
                       },
@@ -510,9 +578,15 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                           onTap: () {
                             ref
                                 .read(selectedProvinceProvider.notifier)
-                                .selectProvince(selectedProvince, moveUserToProvince: true);
+                                .selectProvince(
+                                  selectedProvince,
+                                  moveUserToProvince: true,
+                                );
                             _osmController.move(
-                              ll.LatLng(selectedProvince.latitude, selectedProvince.longitude),
+                              ll.LatLng(
+                                selectedProvince.latitude,
+                                selectedProvince.longitude,
+                              ),
                               16.5,
                             );
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -526,14 +600,19 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                             );
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 7,
+                            ),
                             decoration: BoxDecoration(
                               color: isInsideGeofence
                                   ? AppTheme.safe.withAlpha(45)
                                   : AppTheme.primary.withAlpha(35),
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
-                                color: isInsideGeofence ? AppTheme.safe : AppTheme.primary,
+                                color: isInsideGeofence
+                                    ? AppTheme.safe
+                                    : AppTheme.primary,
                                 width: 1.2,
                               ),
                             ),
@@ -544,7 +623,9 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                                   isInsideGeofence
                                       ? Icons.check_circle_rounded
                                       : Icons.gps_fixed_rounded,
-                                  color: isInsideGeofence ? AppTheme.safe : AppTheme.primary,
+                                  color: isInsideGeofence
+                                      ? AppTheme.safe
+                                      : AppTheme.primary,
                                   size: 14,
                                 ),
                                 const SizedBox(width: 6),
@@ -553,7 +634,9 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                                       ? "📍 ${selectedProvince.name}'desiniz (Check-in Açık)"
                                       : "Konumumu ${selectedProvince.name}'ye Al",
                                   style: TextStyle(
-                                    color: isInsideGeofence ? AppTheme.safe : AppTheme.primary,
+                                    color: isInsideGeofence
+                                        ? AppTheme.safe
+                                        : AppTheme.primary,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 11,
                                   ),
@@ -568,16 +651,23 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                       InkWell(
                         borderRadius: BorderRadius.circular(10),
                         onTap: () {
-                          ref.read(selectedProvinceProvider.notifier).useRealGps();
+                          ref
+                              .read(selectedProvinceProvider.notifier)
+                              .useRealGps();
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text("📡 Cihazın canlı GPS sensörüne dönüldü."),
+                              content: Text(
+                                "📡 Cihazın canlı GPS sensörüne dönüldü.",
+                              ),
                               duration: Duration(seconds: 2),
                             ),
                           );
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 7,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFF1E293B),
                             borderRadius: BorderRadius.circular(10),
@@ -586,11 +676,18 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                           child: const Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.sensors_rounded, color: AppTheme.textSecondary, size: 14),
+                              Icon(
+                                Icons.sensors_rounded,
+                                color: AppTheme.textSecondary,
+                                size: 14,
+                              ),
                               SizedBox(width: 4),
                               Text(
                                 "Gerçek GPS",
-                                style: TextStyle(color: AppTheme.textSecondary, fontSize: 11),
+                                style: TextStyle(
+                                  color: AppTheme.textSecondary,
+                                  fontSize: 11,
+                                ),
                               ),
                             ],
                           ),
@@ -697,7 +794,9 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text("📡 GPS konumu alınıyor, lütfen bekleyin..."),
+                          content: Text(
+                            "📡 GPS konumu alınıyor, lütfen bekleyin...",
+                          ),
                           duration: Duration(seconds: 1),
                         ),
                       );
@@ -879,7 +978,8 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                                             deviceStatus: devStatus,
                                             targetName: target.name,
                                             isBlocked: !isSafe,
-                                            plateCode: selectedProvince.plateCode,
+                                            plateCode:
+                                                selectedProvince.plateCode,
                                           );
 
                                       if (context.mounted) {

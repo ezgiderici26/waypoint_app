@@ -16,28 +16,33 @@ void main() {
       }
     });
 
-    test('All province coordinates are valid within Turkey geographical boundaries', () {
-      for (final province in TurkeyProvinces.all) {
-        // Turkey Latitude is approx 35.8 to 42.2
-        expect(
-          province.latitude,
-          inInclusiveRange(35.5, 42.5),
-          reason: '${province.name} latitude out of bounds: ${province.latitude}',
-        );
+    test(
+      'All province coordinates are valid within Turkey geographical boundaries',
+      () {
+        for (final province in TurkeyProvinces.all) {
+          // Turkey Latitude is approx 35.8 to 42.2
+          expect(
+            province.latitude,
+            inInclusiveRange(35.5, 42.5),
+            reason:
+                '${province.name} latitude out of bounds: ${province.latitude}',
+          );
 
-        // Turkey Longitude is approx 25.5 to 45.0
-        expect(
-          province.longitude,
-          inInclusiveRange(25.0, 45.0),
-          reason: '${province.name} longitude out of bounds: ${province.longitude}',
-        );
+          // Turkey Longitude is approx 25.5 to 45.0
+          expect(
+            province.longitude,
+            inInclusiveRange(25.0, 45.0),
+            reason:
+                '${province.name} longitude out of bounds: ${province.longitude}',
+          );
 
-        expect(province.name.isNotEmpty, isTrue);
-        expect(province.defaultCheckpointName.isNotEmpty, isTrue);
-        expect(province.region.isNotEmpty, isTrue);
-        expect(province.formattedPlate.length, equals(2));
-      }
-    });
+          expect(province.name.isNotEmpty, isTrue);
+          expect(province.defaultCheckpointName.isNotEmpty, isTrue);
+          expect(province.region.isNotEmpty, isTrue);
+          expect(province.formattedPlate.length, equals(2));
+        }
+      },
+    );
   });
 
   group('TurkeyProvinces Nearest Province (Haversine) Tests', () {

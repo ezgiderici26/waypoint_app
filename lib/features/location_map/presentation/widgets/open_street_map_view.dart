@@ -7,10 +7,10 @@ import '../providers/location_providers.dart';
 import '../../../../core/constants/turkey_provinces.dart';
 
 enum MapTileStyle {
-  darkCyberpunk,   // 🌑 Cyberpunk Dark (ESRI Dark Gray Canvas - Zero Key, Zero Watermark)
-  streetOpenMap,   // 🗺️ Klasik Sokak Haritası (OpenStreetMap - Zero Key, Zero Watermark)
+  darkCyberpunk, // 🌑 Cyberpunk Dark (ESRI Dark Gray Canvas - Zero Key, Zero Watermark)
+  streetOpenMap, // 🗺️ Klasik Sokak Haritası (OpenStreetMap - Zero Key, Zero Watermark)
   satelliteHybrid, // 🛰️ Gerçek Uydu Görünümü (ESRI World Imagery - Zero Key, Zero Watermark)
-  streetModern,    // 🏙️ Modern Cadde Haritası (ESRI World Street - Zero Key, Zero Watermark)
+  streetModern, // 🏙️ Modern Cadde Haritası (ESRI World Street - Zero Key, Zero Watermark)
 }
 
 class OpenStreetMapWidget extends StatefulWidget {
@@ -50,7 +50,10 @@ class _OpenStreetMapWidgetState extends State<OpenStreetMapWidget> {
     // 1. Auto-center on user GPS when coordinates arrive for the first time
     if (oldWidget.userLocation == null && widget.userLocation != null) {
       widget.mapController.move(
-        ll.LatLng(widget.userLocation!.latitude, widget.userLocation!.longitude),
+        ll.LatLng(
+          widget.userLocation!.latitude,
+          widget.userLocation!.longitude,
+        ),
         16.0,
       );
     }
@@ -157,7 +160,10 @@ class _OpenStreetMapWidgetState extends State<OpenStreetMapWidget> {
             if (userLoc != null) ...[
               CircleMarker(
                 point: ll.LatLng(userLoc.latitude, userLoc.longitude),
-                radius: (userLoc.accuracy > 0 ? userLoc.accuracy : 15.0).clamp(10.0, 80.0),
+                radius: (userLoc.accuracy > 0 ? userLoc.accuracy : 15.0).clamp(
+                  10.0,
+                  80.0,
+                ),
                 useRadiusInMeter: true,
                 color: userRiskColor.withAlpha(30),
                 borderColor: userRiskColor.withAlpha(160),
@@ -177,8 +183,9 @@ class _OpenStreetMapWidgetState extends State<OpenStreetMapWidget> {
                   ll.LatLng(target.latitude, target.longitude),
                 ],
                 strokeWidth: 2.5,
-                color: (widget.isInsideGeofence ? AppTheme.safe : AppTheme.primary)
-                    .withAlpha(180),
+                color:
+                    (widget.isInsideGeofence ? AppTheme.safe : AppTheme.primary)
+                        .withAlpha(180),
                 pattern: const StrokePattern.dotted(),
               ),
             ],
@@ -201,7 +208,10 @@ class _OpenStreetMapWidgetState extends State<OpenStreetMapWidget> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 5,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFF0F172A),
                           borderRadius: BorderRadius.circular(12),
@@ -217,7 +227,11 @@ class _OpenStreetMapWidgetState extends State<OpenStreetMapWidget> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.verified_rounded, color: AppTheme.safe, size: 14),
+                            const Icon(
+                              Icons.verified_rounded,
+                              color: AppTheme.safe,
+                              size: 14,
+                            ),
                             const SizedBox(width: 6),
                             Text(
                               "${widget.selectedProvince.formattedPlate} ${widget.selectedProvince.name} • SİZ (${widget.riskScore}/100)",
@@ -248,7 +262,10 @@ class _OpenStreetMapWidgetState extends State<OpenStreetMapWidget> {
                             decoration: BoxDecoration(
                               color: AppTheme.safe,
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2.5),
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 2.5,
+                              ),
                               boxShadow: [
                                 BoxShadow(
                                   color: AppTheme.safe.withAlpha(220),
@@ -283,11 +300,17 @@ class _OpenStreetMapWidgetState extends State<OpenStreetMapWidget> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFF0F172A),
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: AppTheme.primary, width: 1.5),
+                          border: Border.all(
+                            color: AppTheme.primary,
+                            width: 1.5,
+                          ),
                           boxShadow: [
                             BoxShadow(
                               color: AppTheme.primary.withAlpha(140),
@@ -347,11 +370,17 @@ class _OpenStreetMapWidgetState extends State<OpenStreetMapWidget> {
                       children: [
                         // Status Pill
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFF0F172A),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: userRiskColor, width: 1.8),
+                            border: Border.all(
+                              color: userRiskColor,
+                              width: 1.8,
+                            ),
                             boxShadow: [
                               BoxShadow(
                                 color: userRiskColor.withAlpha(120),
@@ -410,7 +439,10 @@ class _OpenStreetMapWidgetState extends State<OpenStreetMapWidget> {
                               decoration: BoxDecoration(
                                 color: userRiskColor,
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 2.5),
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2.5,
+                                ),
                                 boxShadow: [
                                   BoxShadow(
                                     color: userRiskColor.withAlpha(220),

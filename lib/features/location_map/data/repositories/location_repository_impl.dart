@@ -33,12 +33,11 @@ class LocationRepositoryImpl implements LocationRepository {
         distanceFilter: 1, // Get updates every meter
       );
 
-      yield* Geolocator.getPositionStream(
-        locationSettings: locationSettings,
-      ).map((Position position) => _mapPositionToLocationData(position))
-      .handleError((error) {
-        // Prevent stream errors from crashing Riverpod / app
-      });
+      yield* Geolocator.getPositionStream(locationSettings: locationSettings)
+          .map((Position position) => _mapPositionToLocationData(position))
+          .handleError((error) {
+            // Prevent stream errors from crashing Riverpod / app
+          });
     } catch (_) {}
   }
 

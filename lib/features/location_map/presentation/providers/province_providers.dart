@@ -9,11 +9,15 @@ class SelectedProvinceNotifier extends StateNotifier<TurkeyProvince> {
   SelectedProvinceNotifier(this.ref) : super(TurkeyProvinces.defaultProvince);
 
   /// Selects a new province and automatically updates the active Geofence target location AND user position.
-  void selectProvince(TurkeyProvince province, {bool moveUserToProvince = true}) {
+  void selectProvince(
+    TurkeyProvince province, {
+    bool moveUserToProvince = true,
+  }) {
     state = province;
 
     ref.read(targetLocationProvider.notifier).state = TargetLocation(
-      name: "${province.formattedPlate} ${province.name} (${province.defaultCheckpointName})",
+      name:
+          "${province.formattedPlate} ${province.name} (${province.defaultCheckpointName})",
       latitude: province.latitude,
       longitude: province.longitude,
       radius: 200.0,

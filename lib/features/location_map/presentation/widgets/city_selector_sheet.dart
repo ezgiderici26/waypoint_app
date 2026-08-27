@@ -18,9 +18,8 @@ class CitySelectorSheet extends ConsumerStatefulWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => CitySelectorSheet(
-        onProvinceSelected: onProvinceSelected,
-      ),
+      builder: (context) =>
+          CitySelectorSheet(onProvinceSelected: onProvinceSelected),
     );
   }
 
@@ -89,9 +88,7 @@ class _CitySelectorSheetState extends ConsumerState<CitySelectorSheet> {
       decoration: const BoxDecoration(
         color: AppTheme.background,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-        border: Border(
-          top: BorderSide(color: AppTheme.primary, width: 2),
-        ),
+        border: Border(top: BorderSide(color: AppTheme.primary, width: 2)),
         boxShadow: [
           BoxShadow(
             color: Color(0x6600D2FF),
@@ -165,7 +162,10 @@ class _CitySelectorSheetState extends ConsumerState<CitySelectorSheet> {
                   ],
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close_rounded, color: AppTheme.textSecondary),
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    color: AppTheme.textSecondary,
+                  ),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
@@ -209,7 +209,10 @@ class _CitySelectorSheetState extends ConsumerState<CitySelectorSheet> {
                   }
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
@@ -218,9 +221,7 @@ class _CitySelectorSheetState extends ConsumerState<CitySelectorSheet> {
                       ],
                     ),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: AppTheme.primary.withAlpha(120),
-                    ),
+                    border: Border.all(color: AppTheme.primary.withAlpha(120)),
                   ),
                   child: Row(
                     children: [
@@ -337,7 +338,9 @@ class _CitySelectorSheetState extends ConsumerState<CitySelectorSheet> {
                     region,
                     style: TextStyle(
                       fontSize: 12,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                       color: isSelected ? Colors.black : AppTheme.textSecondary,
                     ),
                   ),
@@ -405,7 +408,8 @@ class _CitySelectorSheetState extends ConsumerState<CitySelectorSheet> {
                         if (dMeters < 1000) {
                           distanceStr = "${dMeters.round()} m";
                         } else {
-                          distanceStr = "${(dMeters / 1000).toStringAsFixed(1)} km";
+                          distanceStr =
+                              "${(dMeters / 1000).toStringAsFixed(1)} km";
                         }
                       }
 
@@ -505,9 +509,9 @@ class _CitySelectorSheetState extends ConsumerState<CitySelectorSheet> {
                                             Container(
                                               padding:
                                                   const EdgeInsets.symmetric(
-                                                horizontal: 6,
-                                                vertical: 2,
-                                              ),
+                                                    horizontal: 6,
+                                                    vertical: 2,
+                                                  ),
                                               decoration: BoxDecoration(
                                                 color: const Color(0xFF1E293B),
                                                 borderRadius:
@@ -548,8 +552,9 @@ class _CitySelectorSheetState extends ConsumerState<CitySelectorSheet> {
                                           ),
                                           decoration: BoxDecoration(
                                             color: AppTheme.primary,
-                                            borderRadius:
-                                                BorderRadius.circular(12),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
                                           ),
                                           child: const Text(
                                             "AKTİF HEDEF",

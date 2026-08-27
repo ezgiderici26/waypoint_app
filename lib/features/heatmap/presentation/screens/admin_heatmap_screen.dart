@@ -114,7 +114,11 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
             icon: const Icon(Icons.science_rounded, color: AppTheme.primary),
             onPressed: () async {
               await heatmapNotifier.seedHeatmapDemoData(ref);
-              _navigateToLocation('Kadıköy', _hubs['Kadıköy'] ?? const ll.LatLng(40.9905, 29.0255), zoom: 15.0);
+              _navigateToLocation(
+                'Kadıköy',
+                _hubs['Kadıköy'] ?? const ll.LatLng(40.9905, 29.0255),
+                zoom: 15.0,
+              );
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -175,10 +179,10 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
                   circles: clusters.map((cluster) {
                     final color = heatmapState.mode == HeatmapMode.risk
                         ? (cluster.averageRiskScore < 35
-                            ? AppTheme.safe
-                            : (cluster.averageRiskScore < 70
-                                ? AppTheme.suspicious
-                                : AppTheme.spoofed))
+                              ? AppTheme.safe
+                              : (cluster.averageRiskScore < 70
+                                    ? AppTheme.suspicious
+                                    : AppTheme.spoofed))
                         : AppTheme.primary;
                     return CircleMarker(
                       point: ll.LatLng(cluster.latitude, cluster.longitude),
@@ -194,10 +198,10 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
                   markers: clusters.map((cluster) {
                     final color = heatmapState.mode == HeatmapMode.risk
                         ? (cluster.averageRiskScore < 35
-                            ? AppTheme.safe
-                            : (cluster.averageRiskScore < 70
-                                ? AppTheme.suspicious
-                                : AppTheme.spoofed))
+                              ? AppTheme.safe
+                              : (cluster.averageRiskScore < 70
+                                    ? AppTheme.suspicious
+                                    : AppTheme.spoofed))
                         : AppTheme.primary;
                     return Marker(
                       point: ll.LatLng(cluster.latitude, cluster.longitude),
@@ -408,72 +412,73 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
                     ),
                   ),
                   ..._hubs.entries.map((entry) {
-                  final bool isSelected = _selectedHub == entry.key;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: InkWell(
-                      onTap: () => _navigateToLocation(entry.key, entry.value),
-                      borderRadius: BorderRadius.circular(12),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? AppTheme.primary
-                              : AppTheme.surface.withAlpha(235),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
+                    final bool isSelected = _selectedHub == entry.key;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: InkWell(
+                        onTap: () =>
+                            _navigateToLocation(entry.key, entry.value),
+                        borderRadius: BorderRadius.circular(12),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
                             color: isSelected
                                 ? AppTheme.primary
-                                : const Color(0xFF2A3547),
-                            width: isSelected ? 1.5 : 1,
-                          ),
-                          boxShadow: isSelected
-                              ? [
-                                  BoxShadow(
-                                    color: AppTheme.primary.withAlpha(90),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ]
-                              : null,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.near_me_rounded,
-                              size: 14,
+                                : AppTheme.surface.withAlpha(235),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
                               color: isSelected
-                                  ? Colors.white
-                                  : AppTheme.primary,
+                                  ? AppTheme.primary
+                                  : const Color(0xFF2A3547),
+                              width: isSelected ? 1.5 : 1,
                             ),
-                            const SizedBox(width: 6),
-                            Text(
-                              entry.key,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.w500,
+                            boxShadow: isSelected
+                                ? [
+                                    BoxShadow(
+                                      color: AppTheme.primary.withAlpha(90),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.near_me_rounded,
+                                size: 14,
                                 color: isSelected
                                     ? Colors.white
-                                    : AppTheme.textPrimary,
+                                    : AppTheme.primary,
                               ),
-                            ),
-                          ],
+                              const SizedBox(width: 6),
+                              Text(
+                                entry.key,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.w500,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : AppTheme.textPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                }),
-              ],
+                    );
+                  }),
+                ],
+              ),
             ),
           ),
-        ),
 
           // 4. Bottom Analytics Quick Bar (Tappable Pill)
           Positioned(

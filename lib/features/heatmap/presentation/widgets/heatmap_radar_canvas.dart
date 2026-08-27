@@ -74,31 +74,46 @@ class _HeatmapRadarCanvasState extends State<HeatmapRadarCanvas>
           case 'Kadıköy':
             _centerLat = 40.9905;
             _centerLon = 29.0255;
-            _minLat = 40.92; _maxLat = 41.06; _minLon = 28.95; _maxLon = 29.10;
+            _minLat = 40.92;
+            _maxLat = 41.06;
+            _minLon = 28.95;
+            _maxLon = 29.10;
             _zoomScale = 1.8;
             break;
           case 'Beşiktaş':
             _centerLat = 41.0428;
             _centerLon = 29.0075;
-            _minLat = 40.98; _maxLat = 41.10; _minLon = 28.94; _maxLon = 29.08;
+            _minLat = 40.98;
+            _maxLat = 41.10;
+            _minLon = 28.94;
+            _maxLon = 29.08;
             _zoomScale = 1.8;
             break;
           case 'Taksim':
             _centerLat = 41.0370;
             _centerLon = 28.9850;
-            _minLat = 40.97; _maxLat = 41.09; _minLon = 28.92; _maxLon = 29.06;
+            _minLat = 40.97;
+            _maxLat = 41.09;
+            _minLon = 28.92;
+            _maxLon = 29.06;
             _zoomScale = 1.8;
             break;
           case 'Levent':
             _centerLat = 41.0822;
             _centerLon = 29.0125;
-            _minLat = 41.02; _maxLat = 41.14; _minLon = 28.95; _maxLon = 29.08;
+            _minLat = 41.02;
+            _maxLat = 41.14;
+            _minLon = 28.95;
+            _maxLon = 29.08;
             _zoomScale = 1.8;
             break;
           case 'Maslak':
             _centerLat = 41.1060;
             _centerLon = 29.0240;
-            _minLat = 41.04; _maxLat = 41.16; _minLon = 28.96; _maxLon = 29.09;
+            _minLat = 41.04;
+            _maxLat = 41.16;
+            _minLon = 28.96;
+            _maxLon = 29.09;
             _zoomScale = 1.8;
             break;
           default:

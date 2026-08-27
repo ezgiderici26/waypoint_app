@@ -252,22 +252,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
-                    initialValue: const [
-                      "Kadıköy Meydan",
-                      "Beşiktaş Sahil",
-                      "Taksim Metro",
-                      "İzmir Konak Meydanı",
-                      "İzmir Alsancak Kordon",
-                      "İzmir Bornova Meydan",
-                      "Ankara Kızılay",
-                    ].contains(target.name)
+                    initialValue:
+                        const [
+                          "Kadıköy Meydan",
+                          "Beşiktaş Sahil",
+                          "Taksim Metro",
+                          "İzmir Konak Meydanı",
+                          "İzmir Alsancak Kordon",
+                          "İzmir Bornova Meydan",
+                          "Ankara Kızılay",
+                        ].contains(target.name)
                         ? target.name
                         : null,
                     hint: Text(
                       target.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: AppTheme.primary, fontSize: 13),
+                      style: const TextStyle(
+                        color: AppTheme.primary,
+                        fontSize: 13,
+                      ),
                     ),
                     dropdownColor: AppTheme.surface,
                     decoration: const InputDecoration(
@@ -885,7 +889,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         decoration: BoxDecoration(
                           color: AppTheme.primary.withAlpha(30),
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: AppTheme.primary.withAlpha(100)),
+                          border: Border.all(
+                            color: AppTheme.primary.withAlpha(100),
+                          ),
                         ),
                         child: const Icon(
                           Icons.verified_rounded,
@@ -927,14 +933,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     children: [
                       const Text(
                         "🇹🇷 81 İl Akıllı GPS:",
-                        style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.textSecondary,
+                        ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
                           color: AppTheme.safe.withAlpha(30),
                           borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: AppTheme.safe.withAlpha(100)),
+                          border: Border.all(
+                            color: AppTheme.safe.withAlpha(100),
+                          ),
                         ),
                         child: const Text(
                           "AKTİF & ENTEGRE",
@@ -953,7 +967,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     children: [
                       const Text(
                         "📍 Seçili İl & Hedef:",
-                        style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.textSecondary,
+                        ),
                       ),
                       Text(
                         "${selectedProvince.formattedPlate} - ${selectedProvince.name}",
@@ -971,7 +988,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     children: [
                       const Text(
                         "🗺️ Harita Motoru:",
-                        style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.textSecondary,
+                        ),
                       ),
                       const Text(
                         "OpenStreetMap & CartoDB (Sıfır Key)",
@@ -989,7 +1009,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     children: [
                       const Text(
                         "🛰️ Taktik Radar Modu:",
-                        style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.textSecondary,
+                        ),
                       ),
                       const Text(
                         "Tamamen Çevrimdışı Aktif",
@@ -1007,7 +1030,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     children: [
                       const Text(
                         "📦 APK Türü:",
-                        style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.textSecondary,
+                        ),
                       ),
                       const Text(
                         "Evrensel Release APK (İmzalı)",
