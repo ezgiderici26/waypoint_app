@@ -51,13 +51,17 @@ class _OpenStreetMapWidgetState extends State<OpenStreetMapWidget> {
 
     // 1. Auto-center on user GPS when coordinates arrive for the first time
     if (oldWidget.userLocation == null && widget.userLocation != null) {
-      widget.mapController.move(
-        ll.LatLng(
-          widget.userLocation!.latitude,
-          widget.userLocation!.longitude,
-        ),
-        16.0,
-      );
+      try {
+        widget.mapController.move(
+          ll.LatLng(
+            widget.userLocation!.latitude,
+            widget.userLocation!.longitude,
+          ),
+          16.0,
+        );
+      } catch (e) {
+        debugPrint("Map move error: $e");
+      }
     }
   }
 
@@ -86,13 +90,17 @@ class _OpenStreetMapWidgetState extends State<OpenStreetMapWidget> {
           _isMapReady = true;
           widget.onMapReady?.call();
           if (widget.userLocation != null) {
-            widget.mapController.move(
-              ll.LatLng(
-                widget.userLocation!.latitude,
-                widget.userLocation!.longitude,
-              ),
-              16.0,
-            );
+            try {
+              widget.mapController.move(
+                ll.LatLng(
+                  widget.userLocation!.latitude,
+                  widget.userLocation!.longitude,
+                ),
+                16.0,
+              );
+            } catch (e) {
+              debugPrint("Map move error: $e");
+            }
           }
         },
         interactionOptions: const InteractionOptions(

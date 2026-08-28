@@ -241,18 +241,22 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                   _tileStyle = MapTileStyle.streetModern;
                 }
               });
-              if (!_useRadarCanvas) {
+              if (!_useRadarCanvas && _isMapReady) {
                 final currentLoc = locationAsync.value;
-                if (currentLoc != null) {
-                  _osmController.move(
-                    ll.LatLng(currentLoc.latitude, currentLoc.longitude),
-                    15.0,
-                  );
-                } else {
-                  _osmController.move(
-                    ll.LatLng(selectedProvince.latitude, selectedProvince.longitude),
-                    15.0,
-                  );
+                try {
+                  if (currentLoc != null) {
+                    _osmController.move(
+                      ll.LatLng(currentLoc.latitude, currentLoc.longitude),
+                      15.0,
+                    );
+                  } else {
+                    _osmController.move(
+                      ll.LatLng(selectedProvince.latitude, selectedProvince.longitude),
+                      15.0,
+                    );
+                  }
+                } catch (e) {
+                  debugPrint("Map move error: $e");
                 }
               }
             },
@@ -433,8 +437,12 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                   mapController: _osmController,
                   tileStyle: _tileStyle,
                   onMapReady: () {
-                    setState(() {
-                      _isMapReady = true;
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (mounted) {
+                        setState(() {
+                          _isMapReady = true;
+                        });
+                      }
                     });
                   },
                 ),

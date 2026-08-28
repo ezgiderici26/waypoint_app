@@ -205,8 +205,12 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
                 minZoom: 3.0,
                 maxZoom: 19.0,
                 onMapReady: () {
-                  setState(() {
-                    _isMapReady = true;
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) {
+                      setState(() {
+                        _isMapReady = true;
+                      });
+                    }
                   });
                 },
               ),
