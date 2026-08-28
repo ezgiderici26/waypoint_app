@@ -22,6 +22,7 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
   final MapController _osmMapController = MapController();
   String _selectedHub = '34 İstanbul';
   bool _useRadarCanvas = false;
+  bool _isMapReady = false;
 
   // Key Turkey Provincial Hub Locations for Quick Navigation
   static const Map<String, ll.LatLng> _hubs = {
@@ -45,8 +46,12 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
     setState(() {
       _selectedHub = name;
     });
-    if (!_useRadarCanvas) {
-      _osmMapController.move(target, zoom);
+    if (!_useRadarCanvas && _isMapReady) {
+      try {
+        _osmMapController.move(target, zoom);
+      } catch (e) {
+        debugPrint("Map move error: $e");
+      }
     }
   }
 
@@ -98,15 +103,19 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
               setState(() {
                 _useRadarCanvas = !_useRadarCanvas;
               });
-              if (!_useRadarCanvas) {
-                ll.LatLng? target = _hubs[_selectedHub];
-                if (target == null) {
-                  final matches = TurkeyProvinces.search(_selectedHub);
-                  if (matches.isNotEmpty) {
-                    target = ll.LatLng(matches.first.latitude, matches.first.longitude);
+              if (!_useRadarCanvas && _isMapReady) {
+                try {
+                  ll.LatLng? target = _hubs[_selectedHub];
+                  if (target == null) {
+                    final matches = TurkeyProvinces.search(_selectedHub);
+                    if (matches.isNotEmpty) {
+                      target = ll.LatLng(matches.first.latitude, matches.first.longitude);
+                    }
                   }
+                  _osmMapController.move(target ?? const ll.LatLng(40.9905, 29.0255), 15.0);
+                } catch (e) {
+                  debugPrint("Map move error: $e");
                 }
-                _osmMapController.move(target ?? const ll.LatLng(40.9905, 29.0255), 15.0);
               }
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -167,11 +176,16 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
           else
             FlutterMap(
               mapController: _osmMapController,
-              options: const MapOptions(
-                initialCenter: ll.LatLng(40.9905, 29.0255),
+              options: MapOptions(
+                initialCenter: const ll.LatLng(40.9905, 29.0255),
                 initialZoom: 14.5,
                 minZoom: 3.0,
                 maxZoom: 19.0,
+                onMapReady: () {
+                  setState(() {
+                    _isMapReady = true;
+                  });
+                },
               ),
               children: [
                 TileLayer(

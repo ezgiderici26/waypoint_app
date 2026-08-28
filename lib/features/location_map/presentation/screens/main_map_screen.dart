@@ -27,10 +27,15 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
   final MapController _osmController = MapController();
   MapTileStyle _tileStyle = MapTileStyle.darkCyberpunk;
   bool _useRadarCanvas = false;
+  bool _isMapReady = false;
 
   void _safeMoveMap(ll.LatLng target, double zoom) {
-    if (!_useRadarCanvas) {
-      _osmController.move(target, zoom);
+    if (!_useRadarCanvas && _isMapReady) {
+      try {
+        _osmController.move(target, zoom);
+      } catch (e) {
+        debugPrint("Map move error: $e");
+      }
     }
   }
 
@@ -427,6 +432,11 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                   distanceToTarget: distanceToTarget,
                   mapController: _osmController,
                   tileStyle: _tileStyle,
+                  onMapReady: () {
+                    setState(() {
+                      _isMapReady = true;
+                    });
+                  },
                 ),
 
           // 2. Top Info Overlay (Risk Status Chip)

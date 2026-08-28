@@ -22,6 +22,7 @@ class OpenStreetMapWidget extends StatefulWidget {
   final double? distanceToTarget;
   final MapController mapController;
   final MapTileStyle tileStyle;
+  final VoidCallback? onMapReady;
 
   const OpenStreetMapWidget({
     super.key,
@@ -33,6 +34,7 @@ class OpenStreetMapWidget extends StatefulWidget {
     required this.distanceToTarget,
     required this.mapController,
     this.tileStyle = MapTileStyle.darkCyberpunk,
+    this.onMapReady,
   });
 
   @override
@@ -82,6 +84,7 @@ class _OpenStreetMapWidgetState extends State<OpenStreetMapWidget> {
         maxZoom: 19.0,
         onMapReady: () {
           _isMapReady = true;
+          widget.onMapReady?.call();
           if (widget.userLocation != null) {
             widget.mapController.move(
               ll.LatLng(
