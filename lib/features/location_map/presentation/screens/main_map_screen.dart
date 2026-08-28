@@ -28,6 +28,12 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
   MapTileStyle _tileStyle = MapTileStyle.darkCyberpunk;
   bool _useRadarCanvas = false;
 
+  void _safeMoveMap(ll.LatLng target, double zoom) {
+    if (!_useRadarCanvas) {
+      _osmController.move(target, zoom);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // 1. Watch live location stream, geofence, province, and distance
@@ -44,7 +50,7 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
     // 3. Listen to location changes to animate camera and auto-detect nearest province
     ref.listen(locationStreamProvider, (previous, next) {
       next.whenData((location) {
-        _osmController.move(
+        _safeMoveMap(
           ll.LatLng(location.latitude, location.longitude),
           15.0,
         );
@@ -70,7 +76,7 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
     // 4. Listen to province changes to animate camera to the selected city center
     ref.listen(selectedProvinceProvider, (previous, next) {
       if (previous?.plateCode != next.plateCode) {
-        _osmController.move(ll.LatLng(next.latitude, next.longitude), 15.0);
+        _safeMoveMap(ll.LatLng(next.latitude, next.longitude), 15.0);
       }
     });
 
@@ -86,7 +92,7 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
           onTap: () => CitySelectorSheet.show(
             context,
             onProvinceSelected: (province) {
-              _osmController.move(
+              _safeMoveMap(
                 ll.LatLng(province.latitude, province.longitude),
                 15.0,
               );
@@ -153,7 +159,7 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
             onPressed: () => CitySelectorSheet.show(
               context,
               onProvinceSelected: (province) {
-                _osmController.move(
+                _safeMoveMap(
                   ll.LatLng(province.latitude, province.longitude),
                   15.0,
                 );
@@ -168,7 +174,7 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
             onPressed: () {
               final currentLoc = locationAsync.value;
               if (currentLoc != null) {
-                _osmController.move(
+                _safeMoveMap(
                   ll.LatLng(currentLoc.latitude, currentLoc.longitude),
                   16.0,
                 );
@@ -230,6 +236,20 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                   _tileStyle = MapTileStyle.streetModern;
                 }
               });
+              if (!_useRadarCanvas) {
+                final currentLoc = locationAsync.value;
+                if (currentLoc != null) {
+                  _osmController.move(
+                    ll.LatLng(currentLoc.latitude, currentLoc.longitude),
+                    15.0,
+                  );
+                } else {
+                  _osmController.move(
+                    ll.LatLng(selectedProvince.latitude, selectedProvince.longitude),
+                    15.0,
+                  );
+                }
+              }
             },
             itemBuilder: (context) => [
               const PopupMenuItem(
@@ -391,7 +411,7 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                   onOpenCitySelector: () => CitySelectorSheet.show(
                     context,
                     onProvinceSelected: (province) {
-                      _osmController.move(
+                      _safeMoveMap(
                         ll.LatLng(province.latitude, province.longitude),
                         15.0,
                       );
@@ -463,7 +483,7 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                     onTap: () => CitySelectorSheet.show(
                       context,
                       onProvinceSelected: (province) {
-                        _osmController.move(
+                        _safeMoveMap(
                           ll.LatLng(province.latitude, province.longitude),
                           15.0,
                         );
@@ -582,7 +602,7 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                                   selectedProvince,
                                   moveUserToProvince: true,
                                 );
-                            _osmController.move(
+                            _safeMoveMap(
                               ll.LatLng(
                                 selectedProvince.latitude,
                                 selectedProvince.longitude,
@@ -757,7 +777,7 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                   ),
                   tooltip: "Hedef Geofence Noktasına Git",
                   onPressed: () {
-                    _osmController.move(
+                    _safeMoveMap(
                       ll.LatLng(target.latitude, target.longitude),
                       16.0,
                     );
@@ -787,7 +807,7 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                   onPressed: () {
                     final currentLoc = locationAsync.value;
                     if (currentLoc != null) {
-                      _osmController.move(
+                      _safeMoveMap(
                         ll.LatLng(currentLoc.latitude, currentLoc.longitude),
                         16.5,
                       );

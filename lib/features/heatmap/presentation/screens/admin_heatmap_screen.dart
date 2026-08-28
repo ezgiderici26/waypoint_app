@@ -9,6 +9,7 @@ import '../widgets/heatmap_legend.dart';
 import '../widgets/heatmap_stats_sheet.dart';
 import '../widgets/heatmap_point_detail_dialog.dart';
 import '../widgets/heatmap_radar_canvas.dart';
+import '../../../../core/constants/turkey_provinces.dart';
 
 class AdminHeatmapScreen extends ConsumerStatefulWidget {
   const AdminHeatmapScreen({super.key});
@@ -44,7 +45,9 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
     setState(() {
       _selectedHub = name;
     });
-    _osmMapController.move(target, zoom);
+    if (!_useRadarCanvas) {
+      _osmMapController.move(target, zoom);
+    }
   }
 
   void _openStatsSheet() {
@@ -95,6 +98,16 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
               setState(() {
                 _useRadarCanvas = !_useRadarCanvas;
               });
+              if (!_useRadarCanvas) {
+                ll.LatLng? target = _hubs[_selectedHub];
+                if (target == null) {
+                  final matches = TurkeyProvinces.search(_selectedHub);
+                  if (matches.isNotEmpty) {
+                    target = ll.LatLng(matches.first.latitude, matches.first.longitude);
+                  }
+                }
+                _osmMapController.move(target ?? const ll.LatLng(40.9905, 29.0255), 15.0);
+              }
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
