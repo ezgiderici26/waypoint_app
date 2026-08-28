@@ -10,6 +10,7 @@ import '../widgets/heatmap_stats_sheet.dart';
 import '../widgets/heatmap_point_detail_dialog.dart';
 import '../widgets/heatmap_radar_canvas.dart';
 import '../../../../core/constants/turkey_provinces.dart';
+import '../../domain/entities/heatmap_cluster.dart';
 
 class AdminHeatmapScreen extends ConsumerStatefulWidget {
   const AdminHeatmapScreen({super.key});
@@ -62,6 +63,28 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
       backgroundColor: Colors.transparent,
       builder: (_) => const HeatmapStatsSheet(),
     );
+  }
+
+  Color _getClusterColor(HeatmapCluster cluster, HeatmapMode mode) {
+    if (mode == HeatmapMode.density) {
+      if (cluster.count >= 6) {
+        return const Color(0xFFFF3344); // Critical Fire (Red)
+      } else if (cluster.count >= 4) {
+        return const Color(0xFFFF9900); // Orange
+      } else if (cluster.count >= 2) {
+        return const Color(0xFF00FF88); // Green
+      } else {
+        return const Color(0xFF00CCFF); // Blue
+      }
+    } else if (mode == HeatmapMode.risk) {
+      return cluster.averageRiskScore < 35
+          ? AppTheme.safe
+          : (cluster.averageRiskScore < 70
+              ? AppTheme.suspicious
+              : AppTheme.spoofed);
+    } else {
+      return AppTheme.primary; // Cyan
+    }
   }
 
   @override
@@ -202,34 +225,23 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
                   maxZoom: 19,
                   maxNativeZoom: 16,
                 ),
-                CircleLayer(
-                  circles: clusters.map((cluster) {
-                    final color = heatmapState.mode == HeatmapMode.risk
-                        ? (cluster.averageRiskScore < 35
-                              ? AppTheme.safe
-                              : (cluster.averageRiskScore < 70
-                                    ? AppTheme.suspicious
-                                    : AppTheme.spoofed))
-                        : AppTheme.primary;
-                    return CircleMarker(
-                      point: ll.LatLng(cluster.latitude, cluster.longitude),
-                      radius: (cluster.densityLevel * 60.0).clamp(40.0, 300.0),
-                      useRadiusInMeter: true,
-                      color: color.withAlpha(85),
-                      borderColor: color,
-                      borderStrokeWidth: 2.0,
-                    );
-                  }).toList(),
-                ),
+                if (heatmapState.mode != HeatmapMode.points)
+                  CircleLayer(
+                    circles: clusters.map((cluster) {
+                      final color = _getClusterColor(cluster, heatmapState.mode);
+                      return CircleMarker(
+                        point: ll.LatLng(cluster.latitude, cluster.longitude),
+                        radius: (cluster.densityLevel * 60.0).clamp(40.0, 300.0),
+                        useRadiusInMeter: true,
+                        color: color.withAlpha(85),
+                        borderColor: color,
+                        borderStrokeWidth: 2.0,
+                      );
+                    }).toList(),
+                  ),
                 MarkerLayer(
                   markers: clusters.map((cluster) {
-                    final color = heatmapState.mode == HeatmapMode.risk
-                        ? (cluster.averageRiskScore < 35
-                              ? AppTheme.safe
-                              : (cluster.averageRiskScore < 70
-                                    ? AppTheme.suspicious
-                                    : AppTheme.spoofed))
-                        : AppTheme.primary;
+                    final color = _getClusterColor(cluster, heatmapState.mode);
                     return Marker(
                       point: ll.LatLng(cluster.latitude, cluster.longitude),
                       width: 44,
