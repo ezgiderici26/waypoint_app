@@ -19,7 +19,9 @@ android {
     if (localPropertiesFile.exists()) {
         localPropertiesFile.inputStream().use { localProperties.load(it) }
     }
-    val mapsApiKey = localProperties.getProperty("MAPS_API_KEY") ?: "YOUR_GOOGLE_MAPS_API_KEY_HERE"
+    val mapsApiKey = localProperties.getProperty("MAPS_API_KEY")
+        ?: System.getenv("MAPS_API_KEY")
+        ?: "YOUR_GOOGLE_MAPS_API_KEY_HERE"
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true

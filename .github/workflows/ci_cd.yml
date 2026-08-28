@@ -115,15 +115,14 @@ jobs:
       - name: 📦 Install Flutter Dependencies
         run: flutter pub get
 
-      - name: 🔑 Inject Google Maps API Key
-        run: |
-          mkdir -p android
-          echo "MAPS_API_KEY=${{ secrets.MAPS_API_KEY || 'AIzaSyCiCdMockValidationKey2026' }}" > android/local.properties
-
       - name: 🔨 Build Android Debug APK
+        env:
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY || 'AIzaSyCiCdMockValidationKey2026' }}
         run: flutter build apk --debug
 
       - name: 🚀 Build Android Release APK
+        env:
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY || 'AIzaSyCiCdMockValidationKey2026' }}
         run: flutter build apk --release
 
       - name: 📦 Upload APK Artifacts
