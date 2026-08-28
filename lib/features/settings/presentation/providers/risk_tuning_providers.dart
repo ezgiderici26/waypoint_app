@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -106,6 +107,40 @@ class RiskTuningNotifier extends StateNotifier<RiskTuningConfig> {
 final riskTuningProvider =
     StateNotifierProvider<RiskTuningNotifier, RiskTuningConfig>((ref) {
       return RiskTuningNotifier();
+    });
+
+class LiveRiskTuningNotifier extends StateNotifier<RiskTuningConfig> {
+  final Ref _ref;
+  Timer? _debounceTimer;
+
+  LiveRiskTuningNotifier(this._ref) : super(RiskTuningConfig.balanced()) {
+    // Keep live config synchronized with the main tuning provider
+    _ref.listen<RiskTuningConfig>(riskTuningProvider, (previous, next) {
+      _onTuningChanged(next);
+    }, fireImmediately: true);
+  }
+
+  void _onTuningChanged(RiskTuningConfig config) {
+    if (kIsWeb || Platform.environment.containsKey('FLUTTER_TEST')) {
+      state = config;
+      return;
+    }
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      state = config;
+    });
+  }
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
+  }
+}
+
+final liveRiskTuningProvider =
+    StateNotifierProvider<LiveRiskTuningNotifier, RiskTuningConfig>((ref) {
+      return LiveRiskTuningNotifier(ref);
     });
 
 // Live Sandbox Simulation Flags for the Tuning Screen Interactive Sandbox

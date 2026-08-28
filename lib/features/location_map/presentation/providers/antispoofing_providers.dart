@@ -122,7 +122,7 @@ class AntispoofingNotifier extends StateNotifier<RiskState> {
     });
 
     // Re-evaluate when dynamic risk tuning coefficients change
-    _ref.listen<RiskTuningConfig>(riskTuningProvider, (_, __) {
+    _ref.listen<RiskTuningConfig>(liveRiskTuningProvider, (_, __) {
       if (state.currentLocation != null) {
         _evaluateLocation(state.currentLocation!);
       }
@@ -175,7 +175,7 @@ class AntispoofingNotifier extends StateNotifier<RiskState> {
 
     // Load configs
     final sim = _ref.read(simulationProvider);
-    final tuning = _ref.read(riskTuningProvider);
+    final tuning = _ref.read(liveRiskTuningProvider);
     final securityState = _ref.read(securityProvider);
 
     if (prevLocation != null) {
