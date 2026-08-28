@@ -34,21 +34,21 @@ Uygulamanın arayüzleri modern ve endüstri standardı **glassmorphism** ile ka
 <table>
   <tr>
     <td align="center" width="33%">
-      <img src="screenshots/01_map_dashboard.png" width="260" alt="Harita & Güvenli HUD" onerror="this.src='https://placehold.co/260x520/0F172A/38BDF8?text=1.+Canli+Harita+%26+HUD'"/><br/>
+      <img src="screenshots/01_map_dashboard.gif" width="260" alt="Harita & Güvenli HUD" onerror="this.src='https://placehold.co/260x520/0F172A/38BDF8?text=1.+Canli+Harita+%26+HUD'"/><br/>
       <b>📍 1. Canlı Harita & Geofence HUD</b>
     </td>
     <td align="center" width="33%">
-      <img src="screenshots/02_threat_detection.png" width="260" alt="Tehdit Tespiti Alarmı" onerror="this.src='https://placehold.co/260x520/0F172A/EF4444?text=2.+Sahte+Konum+Alarmi'"><br/>
+      <img src="screenshots/02_threat_detection.gif" width="260" alt="Tehdit Tespiti Alarmı" onerror="this.src='https://placehold.co/260x520/0F172A/EF4444?text=2.+Sahte+Konum+Alarmi'"><br/>
       <b>🚨 2. Sahte Konum & Saldırı Alarmı</b>
     </td>
     <td align="center" width="33%">
-      <img src="screenshots/03_heatmap_analytics.png" width="260" alt="Yönetici Isı Haritası" onerror="this.src='https://placehold.co/260x520/0F172A/F59E0B?text=3.+OSM+Isi+Haritasi'"><br/>
+      <img src="screenshots/03_heatmap_analytics.gif" width="260" alt="Yönetici Isı Haritası" onerror="this.src='https://placehold.co/260x520/0F172A/F59E0B?text=3.+OSM+Isi+Haritasi'"><br/>
       <b>🔥 3. OSM Isı Haritası (Heatmap)</b>
     </td>
   </tr>
   <tr>
     <td align="center" width="33%">
-      <img src="screenshots/04_risk_tuning.png" width="260" alt="Dinamik Tuning Paneli" onerror="this.src='https://placehold.co/260x520/0F172A/8B5CF6?text=4.+Risk+Tuning'"><br/>
+      <img src="screenshots/04_risk_sandbox.gif" width="260" alt="Dinamik Tuning Paneli" onerror="this.src='https://placehold.co/260x520/0F172A/8B5CF6?text=4.+Risk+Tuning'"><br/>
       <b>🎛️ 4. Dinamik K1-K7 Kalibrasyon & Sandbox</b>
     </td>
     <td align="center" width="33%">
@@ -56,7 +56,7 @@ Uygulamanın arayüzleri modern ve endüstri standardı **glassmorphism** ile ka
       <b>🔔 5. Arka Plan Bildirim & Olay Günlüğü</b>
     </td>
     <td align="center" width="33%">
-      <img src="screenshots/06_encrypted_history.png" width="260" alt="AES-256 Şifreli Geçmiş" onerror="this.src='https://placehold.co/260x520/0F172A/06B6D4?text=6.+AES-256+Gecmis'"><br/>
+      <img src="screenshots/05_offline_sync.gif" width="260" alt="AES-256 Şifreli Geçmiş" onerror="this.src='https://placehold.co/260x520/0F172A/06B6D4?text=6.+AES-256+Gecmis'"><br/>
       <b>🔐 6. AES-256 Şifreli Geçmiş & Senkron</b>
     </td>
   </tr>
