@@ -55,10 +55,7 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
     // 3. Listen to location changes to animate camera and auto-detect nearest province
     ref.listen(locationStreamProvider, (previous, next) {
       next.whenData((location) {
-        _safeMoveMap(
-          ll.LatLng(location.latitude, location.longitude),
-          15.0,
-        );
+        _safeMoveMap(ll.LatLng(location.latitude, location.longitude), 15.0);
 
         // Auto-detect nearest province if using real GPS (not simulated)
         // and the current selected province does not match the physically nearest province
@@ -251,7 +248,10 @@ class _MainMapScreenState extends ConsumerState<MainMapScreen> {
                     );
                   } else {
                     _osmController.move(
-                      ll.LatLng(selectedProvince.latitude, selectedProvince.longitude),
+                      ll.LatLng(
+                        selectedProvince.latitude,
+                        selectedProvince.longitude,
+                      ),
                       15.0,
                     );
                   }

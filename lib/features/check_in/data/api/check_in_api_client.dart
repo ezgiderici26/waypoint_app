@@ -71,17 +71,16 @@ class CheckInApiClient {
       // Bu sayede emülatörün interneti olmasa bile senkronizasyon simülasyonu kusursuz çalışır!
       if (e is DioException &&
           (e.type == DioExceptionType.connectionTimeout ||
-           e.type == DioExceptionType.sendTimeout ||
-           e.type == DioExceptionType.receiveTimeout ||
-           e.type == DioExceptionType.connectionError ||
-           e.message?.contains('SocketException') == true)) {
-        
+              e.type == DioExceptionType.sendTimeout ||
+              e.type == DioExceptionType.receiveTimeout ||
+              e.type == DioExceptionType.connectionError ||
+              e.message?.contains('SocketException') == true)) {
         developer.log(
           '[API] ⚠️ Fiziksel ağ bağlantısı yok, fakat çevrimdışı mod kapalı olduğu için senkronizasyon BAŞARILI simüle edildi! id=${record.id}',
         );
         return;
       }
-      
+
       // Diğer sunucu/API hatalarını rethrow et
       rethrow;
     }

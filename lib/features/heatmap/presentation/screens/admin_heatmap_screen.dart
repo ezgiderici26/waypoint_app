@@ -80,8 +80,8 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
       return cluster.averageRiskScore < 35
           ? AppTheme.safe
           : (cluster.averageRiskScore < 70
-              ? AppTheme.suspicious
-              : AppTheme.spoofed);
+                ? AppTheme.suspicious
+                : AppTheme.spoofed);
     } else {
       return AppTheme.primary; // Cyan
     }
@@ -132,10 +132,16 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
                   if (target == null) {
                     final matches = TurkeyProvinces.search(_selectedHub);
                     if (matches.isNotEmpty) {
-                      target = ll.LatLng(matches.first.latitude, matches.first.longitude);
+                      target = ll.LatLng(
+                        matches.first.latitude,
+                        matches.first.longitude,
+                      );
                     }
                   }
-                  _osmMapController.move(target ?? const ll.LatLng(40.9905, 29.0255), 15.0);
+                  _osmMapController.move(
+                    target ?? const ll.LatLng(40.9905, 29.0255),
+                    15.0,
+                  );
                 } catch (e) {
                   debugPrint("Map move error: $e");
                 }
@@ -232,10 +238,16 @@ class _AdminHeatmapScreenState extends ConsumerState<AdminHeatmapScreen> {
                 if (heatmapState.mode != HeatmapMode.points)
                   CircleLayer(
                     circles: clusters.map((cluster) {
-                      final color = _getClusterColor(cluster, heatmapState.mode);
+                      final color = _getClusterColor(
+                        cluster,
+                        heatmapState.mode,
+                      );
                       return CircleMarker(
                         point: ll.LatLng(cluster.latitude, cluster.longitude),
-                        radius: (cluster.densityLevel * 60.0).clamp(40.0, 300.0),
+                        radius: (cluster.densityLevel * 60.0).clamp(
+                          40.0,
+                          300.0,
+                        ),
                         useRadiusInMeter: true,
                         color: color.withAlpha(85),
                         borderColor: color,
