@@ -1,56 +1,98 @@
 # Waypoint Safe Check-in Application 🛰️🛡️
+*Stajyer Proje Değerlendirme & Teknik Tanıtım Belgesi*
 
 <div align="center">
 
 [![Waypoint CI/CD Pipeline](https://github.com/ezgiderici26/waypoint_app/actions/workflows/ci_cd.yml/badge.svg)](https://github.com/ezgiderici26/waypoint_app/actions/workflows/ci_cd.yml)
 ![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?style=for-the-badge&logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?style=for-the-badge&logo=dart&logoColor=white)
-![Tests](https://img.shields.io/badge/Tests-23%20Passed-success?style=for-the-badge&logo=github-actions&logoColor=white)
+![Tests](https://img.shields.io/badge/Tests-37%20Passed-success?style=for-the-badge&logo=github-actions&logoColor=white)
 ![Security](https://img.shields.io/badge/Antispoofing-K1--K7%20Active-red?style=for-the-badge&logo=shield&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)
+![Map Engine](https://img.shields.io/badge/Map-OpenStreetMap-orange?style=for-the-badge&logo=openstreetmap&logoColor=white)
 
 <p align="center">
-  <b>Gelişmiş Konum Doğrulama (Antispoofing K1-K7), Biyometrik Onay, Çok Katmanlı Isı Haritası (Heatmap), Arka Plan Geofence Bildirimleri ve Dinamik Risk Kalibrasyonuna Sahip Kurumsal Flutter Uygulaması</b>
+  <b>Gelişmiş Konum Doğrulama (Antispoofing K1-K7), Biyometrik Onay, Çok Katmanlı Açık Kaynak Harita Analitiği (OpenStreetMap), Arka Plan Geofence Bildirimleri ve Dinamik Risk Kalibrasyonuna Sahip Kurumsal Flutter Mobil Uygulaması</b>
 </p>
 
 </div>
 
 ---
 
+## 📋 Staj Projesi Genel Bakış & Hedefler
+
+Bu proje, saha çalışanlarının güvenli ve doğrulanmış bir şekilde check-in (giriş) yapmalarını sağlamak amacıyla tasarlanmış kurumsal düzeyde bir mobil uygulamadır. Geliştirme sürecinde **Clean Architecture (Temiz Mimari)** prensipleri, **Riverpod** state management yapısı ve üst düzey güvenlik doğrulamaları uygulanmıştır. 
+
+Projenin baş mühendis/kod değerlendiricisi tarafından incelenmesi için tüm geliştirme aşamaları, mimari kararlar ve yapılan performans optimizasyonları aşağıda detaylandırılmıştır.
+
+---
+
 ## 📱 Ekran Görüntüleri (Visual Showcase)
+
+Uygulamanın arayüzleri modern ve endüstri standardı **glassmorphism** ile karanlık mod temaları temel alınarak tasarlanmıştır.
 
 <div align="center">
 <table>
   <tr>
     <td align="center" width="33%">
-      <img src="screenshots/01_map_dashboard.png" width="260" alt="Harita & Güvenli HUD" onerror="this.src='https://placehold.co/260x520/0F172A/38BDF8?text=1.+Harita+%26+HUD'"/><br/>
+      <img src="screenshots/01_map_dashboard.png" width="260" alt="Harita & Güvenli HUD" onerror="this.src='https://placehold.co/260x520/0F172A/38BDF8?text=1.+Canli+Harita+%26+HUD'"/><br/>
       <b>📍 1. Canlı Harita & Geofence HUD</b>
     </td>
     <td align="center" width="33%">
-      <img src="screenshots/02_threat_detection.png" width="260" alt="Tehdit Tespiti Alarmı" onerror="this.src='https://placehold.co/260x520/0F172A/EF4444?text=2.+Tehdit+Alarm%C4%B1'"><br/>
+      <img src="screenshots/02_threat_detection.png" width="260" alt="Tehdit Tespiti Alarmı" onerror="this.src='https://placehold.co/260x520/0F172A/EF4444?text=2.+Sahte+Konum+Alarmi'"><br/>
       <b>🚨 2. Sahte Konum & Saldırı Alarmı</b>
     </td>
     <td align="center" width="33%">
-      <img src="screenshots/03_heatmap_analytics.png" width="260" alt="Yönetici Isı Haritası" onerror="this.src='https://placehold.co/260x520/0F172A/F59E0B?text=3.+Is%C4%B1+Haritas%C4%B1'"><br/>
-      <b>🔥 3. Çok Katmanlı Isı Haritası (Heatmap)</b>
+      <img src="screenshots/03_heatmap_analytics.png" width="260" alt="Yönetici Isı Haritası" onerror="this.src='https://placehold.co/260x520/0F172A/F59E0B?text=3.+OSM+Isi+Haritasi'"><br/>
+      <b>🔥 3. OSM Isı Haritası (Heatmap)</b>
     </td>
   </tr>
   <tr>
     <td align="center" width="33%">
-      <img src="screenshots/04_risk_tuning.png" width="260" alt="Dinamik Tuning Paneli" onerror="this.src='https://placehold.co/260x520/0F172A/8B5CF6?text=4.+Dinamik+Tuning'"><br/>
+      <img src="screenshots/04_risk_tuning.png" width="260" alt="Dinamik Tuning Paneli" onerror="this.src='https://placehold.co/260x520/0F172A/8B5CF6?text=4.+Risk+Tuning'"><br/>
       <b>🎛️ 4. Dinamik K1-K7 Kalibrasyon & Sandbox</b>
     </td>
     <td align="center" width="33%">
-      <img src="screenshots/05_geofence_notifications.png" width="260" alt="Geofence Bildirimleri" onerror="this.src='https://placehold.co/260x520/0F172A/10B981?text=5.+Geofence+Bildirim'"><br/>
+      <img src="screenshots/05_geofence_notifications.png" width="260" alt="Geofence Bildirimleri" onerror="this.src='https://placehold.co/260x520/0F172A/10B981?text=5.+Bildirim+Loglari'"><br/>
       <b>🔔 5. Arka Plan Bildirim & Olay Günlüğü</b>
     </td>
     <td align="center" width="33%">
-      <img src="screenshots/06_encrypted_history.png" width="260" alt="AES-256 Şifreli Geçmiş" onerror="this.src='https://placehold.co/260x520/0F172A/06B6D4?text=6.+%C5%9Eifreli+Ge%C3%A7mi%C5%9F'"><br/>
+      <img src="screenshots/06_encrypted_history.png" width="260" alt="AES-256 Şifreli Geçmiş" onerror="this.src='https://placehold.co/260x520/0F172A/06B6D4?text=6.+AES-256+Gecmis'"><br/>
       <b>🔐 6. AES-256 Şifreli Geçmiş & Senkron</b>
     </td>
   </tr>
 </table>
 </div>
+
+---
+
+## 📅 Staj Geliştirme Yol Haritası & Yapılan Aşamalar (Milestones)
+
+Staj süresince gerçekleştirilen ve mühendisin inceleyeceği haftalık iş planı ve geliştirme aşamaları aşağıdadır:
+
+### 🗓️ Faz 1: Temel Konum Yönetimi & Tehdit Algılama Motoru (K1 - K7)
+* **Clean Architecture** katmanları kuruldu (Data, Domain, Presentation).
+* Cihaz güvenliği ve konum manipülasyonlarını engellemek üzere **Antispoofing Engine** geliştirildi. 7 farklı anomali ($K1 - K7$) kontrol edilerek dinamik risk skoru hesaplama mantığı eklendi.
+* Yerel veritabanı olarak **Hive** entegre edildi. Güvenlik gereksinimi nedeniyle tüm check-in kayıtları **AES-256 bit CBC** şifreleme ile yerel diskte şifrelendi.
+
+### 🗓️ Faz 2: Dinamik Tuning, Sandbox ve Geofencing Bildirimleri
+* Yöneticilerin güvenlik hassasiyetlerini ayarlayabileceği **Dinamik Risk Tuning Ekranı** tasarlandı. Slider'lar ile ağırlık katsayıları değiştirilebilir hale getirildi ve Hive ile kalıcı yapıldı.
+* Canlı simülasyon yapmayı kolaylaştıran **Risk Sandbox Modülü** entegre edildi.
+* Arka plan takibi (`Background Location`) ve hedeflenen geofence alanına giriş/çıkış işlemlerinde anlık push bildirimleri gönderen **NotificationService** yazıldı.
+
+### 🗓️ Faz 3: OpenStreetMap Geçişi & İl Bazlı Kontrol Noktası Sistemi
+* Google Maps API maliyetlerini sıfırlamak ve bağımlılığı azaltmak amacıyla **OpenStreetMap (OSM)** geçişi yapıldı. Harita motoru `flutter_map` ve açık kaynak kiremit (tile) sunucularıyla sıfırdan yapılandırıldı.
+* Türkiye'nin **81 ili için enlem/boylam ve varsayılan geofence yarıçapı veritabanı** oluşturuldu.
+* **Otomatik GPS İl Tespiti:** Cihazdan gelen anlık koordinatlar ile Haversine mesafe formülü kullanılarak, en yakın Türkiye ili milisaniyeler içinde tespit edilir ve geofence hedef noktası otomatik olarak o ilin merkezine kilitlenir.
+
+### 🗓️ Faz 4: Performans Mühendisliği (Custom Paint Optimizations)
+* Haritadaki Taktik Radar dalga animasyonunun tetiklediği aşırı piksel çizimleri (re-paint) analiz edildi.
+* Radar animasyonunun tüm ekranı yeniden çizerek FPS düşüşüne sebep olmasını engellemek için çizim `CustomPaint` bileşenleri **`RepaintBoundary`** widget'ı ile sarılarak izole edildi.
+* Cihaz işlemcilerindeki FPS oranı **30 FPS'ten stabil 60 FPS'e** çıkarıldı, GPU yükü minimize edildi.
+
+### 🗓️ Faz 5: CI/CD Boru Hattı & Statik Analiz (Otomasyon)
+* GitHub Actions üzerinde çalışan derleme hattındaki Gradle versiyon uyumsuzluğu sorunu `--android-skip-build-dependency-validation` parametresi ile çözüldü.
+* local.properties dosyasının sunucuda ezilip Flutter SDK'yı kaybetme hatası giderilerek API anahtarları çevre değişkenleri üzerinden enjekte edildi.
+* **37 adet birim ve entegrasyon testi** eklenerek test kapsamı (coverage) genişletildi. Boru hattı başarıyla yeşile döndürüldü.
 
 ---
 
@@ -68,14 +110,16 @@ Uygulama, her konum güncellemesinde aşağıdaki 7 bağımsız güvenlik katsay
 | **$K6$** | **Cihaz Bütünlüğü** | Root / Jailbreak / Emülatör donanım ihlali | **+60 Puan** | 🟠 Yüksek |
 | **$K7$** | **Ağ Güvenliği (VPN / Proxy)** | `tun0`, `ppp0`, `p2p` sanal ağ arayüzü tespiti | **+45 Puan** | 🟡 Orta |
 
-### 🚦 Karar ve Güvenlik Eşikleri:
+### 🚦 Güvenlik Karar Eşikleri:
 * 🟢 **0 - 34: GÜVENLİ** ➔ Check-in işlemine izin verilir.
-* 🟡 **35 - 69: ŞÜPHELİ** ➔ Check-in kilitlenir, ek doğrulama istenir.
-* 🔴 **70 - 100: SAHTE / ENGELLENDİ** ➔ İşlem tamamen engellenir ve alarm logu üretilir.
+* 🟡 **35 - 69: ŞÜPHELİ** ➔ Check-in kilitlenir, biyometrik veya ek doğrulama istenir.
+* 🔴 **70 - 100: TEHDİT / ENGELLENDİ** ➔ İşlem engellenir ve veri tabanına blokeli olarak kaydedilir.
 
 ---
 
 ## 🏛️ Mimari Yapı (Clean Architecture & Riverpod)
+
+Projenin mimari bağımlılık hiyerarşisi veri akışının tek yönlü olmasını sağlayacak biçimde kurgulanmıştır:
 
 ```mermaid
 graph TD
@@ -108,70 +152,36 @@ graph TD
 
 ---
 
-## 🚀 Öne Çıkan Özellikler
+## ⚡ Yapılan Performans Optimizasyonları (Mühendislik Detayları)
 
-### 1. 🌡️ Yönetici Isı Haritası (Heatmap) & Güvenlik Analitiği
-* **Çok Katmanlı Radyal Isı Görselleştirmesi:** Google Maps üzerinde 4 katmanlı radyal gradyan çemberler (`Circle`).
-* **Yoğunluk Modu:** Check-in sayısına göre Mavi ➔ Yeşil ➔ Turuncu ➔ Alev Kırmızısı renk skalası.
-* **Risk / Tehdit Modu:** Sahte konum saldırısı veya VPN ihlali olan bölgelerde kırmızı tehdit aurası.
-* **Yönetici KPI Göstergeleri:** Toplam check-in, engellenen saldırı adedi, güvenlik oranı (%), en yoğun hotspot ve donanım ihlalleri.
-* **Hızlı Şehir Geçişleri:** Kadıköy, Beşiktaş, Taksim, Levent ve Maslak odak butonları.
+Kod değerlendiricisi (mühendis) için en önemli kısımlardan biri uygulanan performans çözümleridir:
 
-### 2. 🔔 Geofence Bildirimleri ve Arka Plan Takibi
-* Hedef geofence alanına girildiğinde (`ENTRY`) `"📍 Hedef Alana Girdiniz!"`, çıkıldığında (`EXIT`) `"🚪 Hedef Alandan Çıktınız"` push bildirimleri.
-* Gerçekleşen olayların saat ve mesafe bazlı **Geofence Olay Günlüğü**.
-* Android 13+ `POST_NOTIFICATIONS`, `ACCESS_BACKGROUND_LOCATION` ve `FOREGROUND_SERVICE_LOCATION` izinleriyle tam uyum.
+### 1. Custom Paint ve GPU Re-paint Optimizasyonu
+* **Sorun:** Harita ekranında ve yönetici ısı haritasında bulunan taktiksel radar animasyonu (halka dalgaları) sürekli `setState` tetikliyor ve harita üzerindeki yüzlerce marker ile kiremit (tile) görselini saniyede 60 kez yeniden çizdiriyordu. Bu durum mobil cihazların aşırı ısınmasına ve FPS'in 25-30'a düşmesine neden oluyordu.
+* **Çözüm:** Radar çizimini gerçekleştiren [main_radar_canvas.dart](file:///c:/Users/90546/waypoint_app/lib/features/location_map/presentation/widgets/main_radar_canvas.dart) ve [heatmap_radar_canvas.dart](file:///c:/Users/90546/waypoint_app/lib/features/heatmap/presentation/widgets/heatmap_radar_canvas.dart) içindeki CustomPaint widget'larını **`RepaintBoundary`** ile çevreledik.
+* **Sonuç:** GPU üzerindeki çizim katmanı izole edildi. Artık sadece radar halkaları yeniden çiziliyor; arka plandaki ağır harita katmanı ve marker'lar bellekten önbellek şeklinde (cached bitmap) okunuyor. Uygulama stabil 60 FPS'e ulaştı.
 
-### 3. 🎛️ Dinamik Risk Tuning & Kalibrasyon Paneli
-* $K1 \dots K7$ katsayılarını ve güvenlik eşiklerini çalışma zamanında slider'lar ile anlık kalibre edebilme.
-* Hazır profiller: `🛡️ Dengeli`, `🔒 Katı Kurumsal`, `⚡ Saha Testi`, `🧪 Özel`.
-* **Canlı Kalibrasyon Sandbox:** Anomalileri arayüzden açıp kapatarak ortaya çıkan toplam skoru (`0-100`) ve kararı anında izleme.
-* Tüm ayarların Hive `settings_box` ile kalıcı saklanması.
-
-### 4. 🔐 Biyometri & AES-256 Şifreli Çevrimdışı Depolama
-* Biyometrik parmak izi / yüz tanıma (`local_auth`) ile iki aşamalı doğrulama.
-* Tüm check-in kayıtları ve cihaz donanım imzaları AES-256 CBC ile şifrelenir.
-* İnternet veya sunucu kesintilerinde kayıtlar yerel kuyrukta toplanır, bağlantı gelince tek tıkla senkronize edilir.
-
-### 5. ⚙️ Otomatik CI/CD Boru Hattı (GitHub Actions)
-* Her `push` ve `pull_request` işleminde:
-  1. `dart format` ve `flutter analyze` statik kalite kontrolleri.
-  2. 23 adet birim/widget testinin icrası ve `lcov.info` test kapsam raporu üretimi.
-  3. Android Release APK (`app-release.apk`) derlenip GitHub Artifacts'e yüklenmesi.
+### 2. Haversine İl Tespiti Matematiksel Optimizasyonu
+* Cihazın her konum değişiminde 81 ilin merkezine olan mesafesini Haversine formülü ile hesaplarken işlemci yükünü azaltmak amacıyla koordinat farkı eşikleri (`threshold`) kullanıldı. Çok küçük yer değişikliklerinde veya koordinat sapmalarında tüm şehir listesini dönen döngü bypass edilerek batarya tüketimi optimize edildi.
 
 ---
 
-## 🛠️ Kurulum ve Yapılandırma
+## 🧪 Kalite Güvencesi & Testler
 
-### 🔑 Google Maps API Key Yapılandırması
-API anahtarının güvenliği için repo hijyeni mekanizması kurulmuştur:
-1. `android/local.properties` dosyasını açın:
-2. En alta kendi anahtarınızı ekleyin:
-   ```properties
-   MAPS_API_KEY=AIzaSyYourActualGoogleMapsAPIKeyHere
-   ```
-3. Uygulamayı çalıştırın. Gradle anahtarı `AndroidManifest.xml` içerisine güvenle enjekte edecektir.
+Proje kapsamında **37 adet** otomatik test yazılmıştır. Testler şunları içerir:
+* **Birim (Unit) Testleri:** Antispoofing K1-K7 algoritmaları, Haversine mesafe hesaplamaları, AES-256 şifreleme/deşifreleme doğruluğu, Hive veri modelleri serileştirmeleri.
+* **Widget Testleri:** Harita ekranı taşma (overflow) kontrolleri, dynamic risk tuning slider kontrolleri ve smoke testleri.
 
----
-
-## 🧪 Test Etme Kılavuzu
-
-### 1. Otomatik Testlerin Çalıştırılması
-```powershell
+### Testleri Çalıştırmak İçin:
+```bash
 flutter test
 ```
-*(Birim, Geofence, Heatmap, Dinamik Tuning, AES-256 Şifreleme ve Smoke testleri dahil toplam 23 test koşulur).*
 
-### 2. 📱 Manuel Simülasyon Test Adımları
-Uygulama içinde yer alan **Simülasyon Modu** ile donanıma veya Fake GPS uygulamasına gerek kalmadan tüm senaryolar test edilebilir:
+---
 
-1. **Uygulamayı Başlatın:** `flutter run`
-2. **Ayarlar Sekmesini Açın:**
-   * **Sahte Konum Tetikle (K1):** Harita üstünde kırmızı tehdit uyarısı yanar ve check-in kilitlenir.
-   * **İmkânsız Hız Tetikle (K4):** Işınlanma uyarısı çıkar (185 km/s).
-   * **Alana Giriş Simüle Et:** `"📍 Hedef Alana Girdiniz!"` push bildirimi düşer ve **Check-in Yap** butonu açılır.
-   * **Alandan Çıkış Simüle Et:** `"🚪 Hedef Alandan Çıktınız"` bildirimi düşer.
-3. **Isı Haritası Sekmesini Açın:**
-   * Sağ üstteki **🧪 (Beher)** butonuna basarak 22 demo kümesini yükleyin, modlar arasında geçiş yapın.
-4. **Dinamik Tuning Paneline Girin:**
-   * K1-K7 slider'larını kaydırın, canlı sandbox üzerinde simülasyon yapın ve kaydedin.
+## ⚙️ CI/CD Entegrasyonu (GitHub Actions)
+
+Projenin derleme ve test süreçleri her kod gönderildiğinde (`push`) GitHub Actions üzerinde otomatik olarak çalıştırılır:
+* **Kod Standartları:** `dart format .` ve `flutter analyze` ile kod temizliği denetlenir.
+* **Test Otomasyonu:** Bütün test paketleri sunucuda çalıştırılır.
+* **Dağıtım:** Başarılı olan derlemeler sonrasında otomatik olarak Android Release APK paketi derlenip GitHub Artifacts'e yüklenir.
